@@ -18,8 +18,11 @@ Usage: cminus [options] input_file
   -h, --help            show this usage guide
 
 For example:
+ # Compile prog1.cm to prog.exe (fails if prog1.exe exists)
  cminus.bat -o prog.exe prog1.cm
+ # Compile prog.cm to prog.exe (fails if prog.exe exists)
  cminus.bat prog.cm
+ # Compile prog1.cm to prog.exe verbosely (overwrites if prog.exe exists)
  cminus.bat -o prog.exe -v -f prog1.cm
 ```
 
@@ -265,7 +268,7 @@ Output:
 
 ## Example 6
 
-```
+```C
 int f( int a, int b, int c, int d, int e) {
     
     write a;
