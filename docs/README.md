@@ -1,15 +1,26 @@
 # Usage
 
-Run the compiler using the `cminus.bat` file (or `cminus` for linux) in the `bin/` folder.
-
-Usage: cminus INPUT OUTPUT
-
-  -v                    explain what is being done verbosely 
-
-For example:
+Run the compiler using the `cminus.bat` file (or `cminus` for linux) in the 
+`bin/` folder.
 
 ```
-> cminus.bat input.cm output.exe
+Usage: cminus [options] input_file
+ `cminus` compiles the C- source language in the `input_file` into an 
+ executable in the `output_file`
+
+ If the `-o` option is not used, then the output file will have the same name 
+ as the input file but with an executable extension.
+
+ options:
+  -o output_file        specifies the output executable
+  -f                    overwrites the output file if it already exists
+  -v                    explain what is being done verbosely
+  -h, --help            show this usage guide
+
+For example:
+ cminus.bat -o prog.exe prog1.cm
+ cminus.bat prog.cm
+ cminus.bat -o prog.exe -v -f prog1.cm
 ```
 
 # C- Language
