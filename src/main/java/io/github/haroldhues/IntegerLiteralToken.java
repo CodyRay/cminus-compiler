@@ -4,8 +4,8 @@ public class IntegerLiteralToken extends Token
 {
     public Integer value;
     
-    public IntegerLiteralToken(TokenType type, Integer value) {
-        super(type);
+    public IntegerLiteralToken(Integer value) {
+        super(TokenType.IntegerLiteral);
         this.value = value;
     }
 }

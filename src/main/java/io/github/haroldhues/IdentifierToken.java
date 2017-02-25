@@ -4,8 +4,8 @@ public class IdentifierToken extends Token
 {
     public String identifier;
     
-    public IdentifierToken(TokenType type, String identifier) {
-        super(type);
+    public IdentifierToken(String identifier) {
+        super(TokenType.Identifier);
         this.identifier = identifier;
     }
 }

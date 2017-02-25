@@ -7,4 +7,8 @@ public class Token
     public Token(TokenType type) {
         this.type = type;
     }
+
+    public Token(String text) {
+        throw new UnsupportedOperationException();
+    }
 }
