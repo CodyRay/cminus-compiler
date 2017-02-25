@@ -1,43 +1,44 @@
 package io.github.haroldhues;
 
 import java.util.List;
+import java.util.stream.Stream;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Scanner extends Enumerable<Token>
 {
     public Enumerable<Character> source;
-    public Enumerable<Character>.Item nextChar;
+    public Enumerable<Character>.Item currentChar;
     public int lineNumber;
 
     public Scanner(Enumerable<Character> source) {
         this.source = source;
         lineNumber = 1;
-        nextChar = source.next();
+        currentChar = source.next();
     }
 
     private void moveNext() {
-        if (nextChar.getStatus() != Status.Value) {
+        if (currentChar.getStatus() != Status.Value) {
             throw new UnsupportedOperationException("Source is in an error state or is out of input");
         }
-        if (nextChar.getValue() == '\n') {
+        if (currentChar.getValue() == '\n') {
             lineNumber++;
         }
-        nextChar = source.next();
+        currentChar = source.next();
     }
 
-    private boolean nextIs(char... symbols) {
-        char token = nextChar.getStatus() != Status.Value ? nextChar.getValue() : '\n';
+    private boolean currentIs(char... symbols) {
+        char token = currentChar.getStatus() != Status.Value ? currentChar.getValue() : '\n';
         return Arrays.asList(symbols).contains(token);
     }
 
-    private boolean nextIsDigit() {
-        char token = nextChar.getStatus() != Status.Value ? nextChar.getValue() : '\n';
+    private boolean currentIsDigit() {
+        char token = currentChar.getStatus() != Status.Value ? currentChar.getValue() : '\n';
         return (int)'0' <= (int)token && (int)token <= (int)'9';
     }
 
-    private boolean nextIsLetter() {
-        char token = nextChar.getStatus() != Status.Value ? nextChar.getValue() : '\n';
+    private boolean currentIsLetter() {
+        char token = currentChar.getStatus() != Status.Value ? currentChar.getValue() : '\n';
         return ((int)'A' <= (int)token && (int)token <= (int)'Z') || ((int)'a' <= (int)token && (int)token <= (int)'z');
     }
 
@@ -70,42 +71,43 @@ public class Scanner extends Enumerable<Token>
         try {
             State state = State.Initial;
             List<Character> tokenText = new ArrayList<Character>();
-            boolean lastTokenSeen = false;
-            while(nextChar.getStatus() != Status.Error && !lastTokenSeen) {
+            boolean finalCharacterSeen = false;
+            while(!finalCharacterSeen) {
+                if (currentChar.getStatus() == Status.Error) {
+                    return new Item(currentChar.getError());
+                }
+                // Step 1: Move to next state
                 state = nextState(state);
 
-                if (nextChar.getStatus() == Status.End) {
-                    lastTokenSeen = true;
+                // Step 2: Move the source input stream and accumulate tokens based on the resulting state 
+                if (currentChar.getStatus() == Status.End) {
+                    finalCharacterSeen = true;
                 } else if (state == State.Initial) {
                     moveNext(); // If we are in initial that means we should discard the content before the next token
                 } else if (state != State.AcceptLiteral && state != State.AcceptIdentifier && state != State.AcceptSymbol) {
                     // All other states (including EndComment) must consume input on the traversal to them
-                    tokenText.add(nextChar.getValue());
+                    tokenText.add(currentChar.getValue());
                     moveNext();
                 }
                 
+                // Step 3: Continue Running the loop until we are in an accept state (or the end comment state)
                 if (state != State.EndComment && state != State.AcceptIdentifier && state != State.AcceptLiteral && state != State.AcceptSymbol) {
                     continue; // Continue until we reach an acceptance state
                 }
                 
                 String text = join(tokenText);
+                // Step 3 Also: Return to the start state and discard the accumulated tokens if we are at the end of a comment
                 if (state == State.EndComment) {
                     tokenText.clear();
                     state = State.Initial;
                     continue; // We just exited a comment, start over
                 }
 
-                return 
-                    state == State.AcceptIdentifier ?
-                        new Item(new IdentifierToken(text)) :
-                    state == State.AcceptLiteral ?
-                        new Item(new IntegerLiteralToken(Integer.parseInt(text))) :
-                    new Item(new Token(text));
+                // Step 4: Emit a token based on the specific acceptance state
+                return new Item(identifyToken(state, text));
             }
 
-            if (nextChar.getStatus() == Status.Error) {
-                return new Item(nextChar.getError());
-            } else if (nextChar.getStatus() == Status.End && state != State.Initial) {
+            if (currentChar.getStatus() == Status.End && state != State.Initial) {
                 return new Item(new CompileError("Unexpected End of Input")); // End
             } else {
                 return new Item(); // We must be at State.Initial and the end of input
@@ -115,67 +117,79 @@ public class Scanner extends Enumerable<Token>
         }
     }
 
+    private static Token identifyToken(State state, String text) {
+        if (Stream.of(ReservedKeyword.reservedKeywords).anyMatch(keyword -> keyword.text == text)) {
+            return new Token(text); // This is actually a keyword, so we use the simple token
+        }
+        return 
+            state == State.AcceptIdentifier ?
+                new IdentifierToken(text) :
+            state == State.AcceptLiteral ?
+                new IntegerLiteralToken(Integer.parseInt(text)) :
+            new Token(text);
+    }
+
     private State nextState(State state) throws Exception {
         switch(state) {
             case Initial:
                 return
-                    nextIs('+', '-', '*', ';', ',', '(', ')', '[', ']', '{', '}') ?
+                    currentIs('+', '-', '*', ';', ',', '(', ')', '[', ']', '{', '}') ?
                         State.In6 :
-                    nextIs('<', '>', '=') ?
+                    currentIs('<', '>', '=') ?
                         State.In3 :
-                    nextIsDigit() ?
+                    currentIsDigit() ?
                         State.In1 :
-                    nextIsLetter() ?
+                    currentIsLetter() ?
                         State.In2 :
-                    nextIs('!') ?
+                    currentIs('!') ?
                         State.In5 :
-                    nextIs('\\') ?
+                    currentIs('\\') ?
                         State.In6 : 
                     State.Initial; // Loop
             case In1:
                 return 
-                    nextIsDigit() ?
+                    currentIsDigit() ?
                         State.In1 :
                     State.AcceptLiteral;
             case In2:
                 return 
-                    nextIsLetter() ?
+                    currentIsLetter() ?
                         State.In2 : // Loop
                     State.AcceptIdentifier;
             case In3:
                 return 
-                    nextIs('=') ?
+                    currentIs('=') ?
                         State.In4 :
                     State.AcceptSymbol;
             case In4:
                 return State.AcceptSymbol;
             case In5:
-                if (!nextIs('=')) {
+                if (!currentIs('=')) {
                     throw new Exception("Unexpected character, expected '='");
                 }
                 return State.In4;
             case In6:
                 return 
-                    nextIs('*') ?
+                    currentIs('*') ?
                         State.In8 :
-                    nextIs('!') ?
+                    currentIs('!') ?
                         State.In9 :
                     State.AcceptSymbol;
             case In7:
                 return 
-                    nextIs('*') ?
+                    currentIs('*') ?
                         State.In7 : // Loop
-                    nextIs('/') ?
+                    currentIs('/') ?
                         State.EndComment :
                     State.In8;
             case In8:
                 return
-                    nextIs('*') ?
+                    currentIs('*') ?
                         State.In7 :
                     State.In8; // Loop
             case In9:
                 return
-                    nextIs('\n') ?
+                    currentIs('\n') ?
                         State.EndComment :
                     State.In9;
             default:
