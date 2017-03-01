@@ -6,4 +6,8 @@ public class CompileError
     public CompileError(String message) {
         this.message = message;
     }
+
+    public String toString() {
+        return message;
+    }
 }

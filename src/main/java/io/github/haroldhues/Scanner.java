@@ -1,6 +1,7 @@
 package io.github.haroldhues;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,18 +28,18 @@ public class Scanner extends Enumerable<Token>
         currentChar = source.next();
     }
 
-    private boolean currentIs(char... symbols) {
-        char token = currentChar.getStatus() != Status.Value ? currentChar.getValue() : '\n';
+    private boolean currentIs(Character... symbols) {
+    	Character token = currentChar.getStatus() == Status.Value ? currentChar.getValue() : '\n';
         return Arrays.asList(symbols).contains(token);
     }
 
     private boolean currentIsDigit() {
-        char token = currentChar.getStatus() != Status.Value ? currentChar.getValue() : '\n';
+        char token = currentChar.getStatus() == Status.Value ? currentChar.getValue() : '\n';
         return (int)'0' <= (int)token && (int)token <= (int)'9';
     }
 
     private boolean currentIsLetter() {
-        char token = currentChar.getStatus() != Status.Value ? currentChar.getValue() : '\n';
+        char token = currentChar.getStatus() == Status.Value ? currentChar.getValue() : '\n';
         return ((int)'A' <= (int)token && (int)token <= (int)'Z') || ((int)'a' <= (int)token && (int)token <= (int)'z');
     }
 
@@ -118,9 +119,12 @@ public class Scanner extends Enumerable<Token>
     }
 
     private static Token identifyToken(State state, String text) {
-        if (Stream.of(ReservedKeyword.reservedKeywords).anyMatch(keyword -> keyword.text == text)) {
-            return new Token(text); // This is actually a keyword, so we use the simple token
-        }
+    	for (Lexeme lex : Lexeme.reservedKeywords) {
+    		if (lex.text.equals(text)) {
+    			return new Token(lex.type);
+    		}
+    	}
+    	
         return 
             state == State.AcceptIdentifier ?
                 new IdentifierToken(text) :
@@ -134,7 +138,7 @@ public class Scanner extends Enumerable<Token>
             case Initial:
                 return
                     currentIs('+', '-', '*', ';', ',', '(', ')', '[', ']', '{', '}') ?
-                        State.In6 :
+                        State.In4 :
                     currentIs('<', '>', '=') ?
                         State.In3 :
                     currentIsDigit() ?
@@ -143,13 +147,13 @@ public class Scanner extends Enumerable<Token>
                         State.In2 :
                     currentIs('!') ?
                         State.In5 :
-                    currentIs('\\') ?
+                    currentIs('/') ?
                         State.In6 : 
                     State.Initial; // Loop
             case In1:
                 return 
                     currentIsDigit() ?
-                        State.In1 :
+                        State.In1 : // Loop
                     State.AcceptLiteral;
             case In2:
                 return 
@@ -172,7 +176,7 @@ public class Scanner extends Enumerable<Token>
                 return 
                     currentIs('*') ?
                         State.In8 :
-                    currentIs('!') ?
+                    currentIs('/') ?
                         State.In9 :
                     State.AcceptSymbol;
             case In7:

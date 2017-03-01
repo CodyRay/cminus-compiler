@@ -38,14 +38,14 @@ public abstract class Enumerable<T>
             if (status == Status.Value) {
                 return value;
             }
-            throw new UnsupportedOperationException("This item has no value");
+            throw new UnsupportedOperationException("This item has no value, its type is " + status.toString());
         }
 
         public CompileError getError() {
             if (status == Status.Error) {
                 return error;
             }
-            throw new UnsupportedOperationException("This item has no error");
+            throw new UnsupportedOperationException("This item has no error, its type is " + status.toString());
         }
 
     }

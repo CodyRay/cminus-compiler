@@ -10,22 +10,41 @@ public class Token
     public TokenType type;
 
     private static final HashMap<String, TokenType> tokenTypeMap = new HashMap<String, TokenType>();
+    private static final HashMap<TokenType, String> lexemeMap = new HashMap<TokenType, String>();
     
     public Token(TokenType type) {
         this.type = type;
     }
+    private static void buildTypeMap() {
+        if (tokenTypeMap.size() == 0) {
+            for(Lexeme lex: Stream.concat(Stream.of(Lexeme.reservedKeywords), Stream.of(Lexeme.symbols)).collect(Collectors.toList())) {
+                tokenTypeMap.put(lex.text, lex.type);
+                lexemeMap.put(lex.type, lex.text);
+            }
+        }
+    }
 
     public Token(String text) {
-        if (tokenTypeMap.size() == 0) {
-            tokenTypeMap.putAll(
-                Stream
-                    .of(ReservedKeyword.reservedKeywords)
-                    .collect(Collectors.toMap(keyword -> keyword.text, keyword -> keyword.type)));
-            tokenTypeMap.putAll(
-                Stream
-                    .of(Symbol.symbols)
-                    .collect(Collectors.toMap(symbol -> symbol.text, symbol -> symbol.type)));
-        }
+        buildTypeMap();
         this.type = tokenTypeMap.get(text);
+    }
+
+    public String toString() {
+        buildTypeMap();
+        return lexemeMap.get(type) + " ";
+    }
+    
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        
+        if (!(other instanceof Token)) {
+            return false;
+        }
+         
+        Token that = (Token) other;
+ 
+        return this.type == that.type;
     }
 }
