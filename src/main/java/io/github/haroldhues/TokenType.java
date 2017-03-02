@@ -29,5 +29,6 @@ public enum TokenType {
     LeftBracket,
     RightBracket,
     LeftBrace,
-    RightBrace
+    RightBrace,
+    Eof,
 }

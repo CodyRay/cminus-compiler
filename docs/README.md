@@ -297,3 +297,14 @@ Output:
 5
 15
 ```
+
+# Compiler
+
+## Parser
+
+The parser is a finite state machine based of of the regular expressions for the tokens.
+
+![Parser Automata](ParserAutomata.jpg)
+
+The code uses the same numbers as the diagram, but the different states are represented by an enumeration.
+
