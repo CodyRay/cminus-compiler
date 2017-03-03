@@ -2,13 +2,11 @@ package io.github.haroldhues;
 
 import java.util.function.Consumer;
 
-import javax.naming.OperationNotSupportedException;
-
-import io.github.haroldhues.Enumerable.Status;
+import io.github.haroldhues.SyntaxTree.*;
+import io.github.haroldhues.Tokens.*;
 
 public class Parser {
     private Enumerable<Token> source;
-    private Consumer<SyntaxTree> visitor;
     private Enumerable<Token>.Item currentItem;
 
     public Parser(Enumerable<Token> source) {
@@ -20,9 +18,9 @@ public class Parser {
             currentItem = source.next();
         }
 
-        if (currentItem.getStatus() == Status.Value) {
+        if (currentItem.getStatus() == Enumerable.Status.Value) {
             return currentItem.getValue();
-        } else if (currentItem.getStatus() == Status.End) {
+        } else if (currentItem.getStatus() == Enumerable.Status.End) {
             throw new Exception("Unexpected End of Input");
         } else {
             throw new Exception(currentItem.getError().message);
@@ -35,11 +33,6 @@ public class Parser {
 
     public void moveNextToken() {
         currentItem = source.next();
-    }
-
-    public <T extends SyntaxTree> T visit(T node) {
-        visitor.accept(node);
-        return node;
     }
 
     public boolean parseTokenIf(TokenType type) throws Exception {
@@ -89,8 +82,7 @@ public class Parser {
         throw new Exception(builder.toString());
     }
 
-    public ProgramSyntaxNode parse(Consumer<SyntaxTree> visitor) {
-        this.visitor = visitor;
-        return new ProgramSyntaxNode(this);
+    public ProgramSyntaxNode parse(Consumer<SyntaxTreeNode> visitor) throws Exception {
+        return new ProgramSyntaxNode(this, visitor);
     }
 }

@@ -1,4 +1,4 @@
-package io.github.haroldhues;
+package io.github.haroldhues.Tokens;
 
 public class Lexeme {
     public final TokenType type;

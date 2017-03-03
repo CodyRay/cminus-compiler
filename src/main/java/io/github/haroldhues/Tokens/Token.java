@@ -1,4 +1,4 @@
-package io.github.haroldhues;
+package io.github.haroldhues.Tokens;
 
 import java.util.stream.Stream;
 import java.util.HashMap;

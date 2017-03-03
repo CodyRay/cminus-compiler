@@ -1,10 +1,13 @@
 package io.github.haroldhues;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
+import io.github.haroldhues.Tokens.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+
+
 
 public class Scanner extends Enumerable<Token>
 {

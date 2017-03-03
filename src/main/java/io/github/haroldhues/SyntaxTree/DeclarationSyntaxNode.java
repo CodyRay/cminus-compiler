@@ -1,6 +1,17 @@
-package io.github.haroldhues;
+package io.github.haroldhues.SyntaxTree;
 
-public class DeclarationSyntaxNode extends SyntaxTree {
+import java.util.function.Consumer;
+
+import io.github.haroldhues.Parser;
+import io.github.haroldhues.Tokens.IdentifierToken;
+import io.github.haroldhues.Tokens.IntegerLiteralToken;
+import io.github.haroldhues.Tokens.TokenType;
+
+
+
+
+
+public class DeclarationSyntaxNode extends SyntaxTreeNode {
     public enum Type {
         Variable,
         ArrayVariable,
@@ -14,8 +25,8 @@ public class DeclarationSyntaxNode extends SyntaxTree {
     public ParamsNode functionParams;
     public CompoundStatementNode functionBody;
 
-    public DeclarationSyntaxNode(Parser parser) throws Exception {
-        typeSpecifier = new TypeSpecifierNode(parser);
+    public DeclarationSyntaxNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws Exception {
+        typeSpecifier = new TypeSpecifierNode(parser, visitor);
         if(parser.currentIs(TokenType.Identifier)) {
             identifier = ((IdentifierToken)parser.currentToken()).identifier;
         } else {
@@ -31,13 +42,13 @@ public class DeclarationSyntaxNode extends SyntaxTree {
             parser.parseToken(TokenType.Semicolon);
         } else if(parser.parseTokenIf(TokenType.LeftParenthesis)) {
             type = Type.Function;
-            functionParams = new ParamsNode(parser);
+            functionParams = new ParamsNode(parser, visitor);
             parser.parseToken(TokenType.RightParenthesis);
-            functionBody = new CompoundStatementNode(parser);
+            functionBody = new CompoundStatementNode(parser, visitor);
 
         } else {
             parser.throwExpected(TokenType.Semicolon, TokenType.LeftBracket, TokenType.LeftParenthesis);
         }
-        parser.visit(this);
+        visitor.accept(this);
     }
 }

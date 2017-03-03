@@ -6,6 +6,11 @@ import java.util.List;
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
+import io.github.haroldhues.Tokens.IdentifierToken;
+import io.github.haroldhues.Tokens.IntegerLiteralToken;
+import io.github.haroldhues.Tokens.Token;
+import io.github.haroldhues.Tokens.TokenType;
+
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 
@@ -160,7 +165,7 @@ public class ScannerTest {
 		StringSource testSource = new StringSource("!(invalid)");
 		Scanner testScanner = new Scanner(testSource);
 		try {
-			List<Token> result = testScanner.toList();
+			testScanner.toList();
 			fail("Exception should be thrown");
 		} catch (Exception ex) {
 			assertThat(ex.getMessage(), CoreMatchers.containsString("Unexpected character"));
