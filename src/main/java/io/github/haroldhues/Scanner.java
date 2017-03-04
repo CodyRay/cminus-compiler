@@ -14,6 +14,7 @@ public class Scanner extends Enumerable<Token>
     public Enumerable<Character> source;
     public Enumerable<Character>.Item currentChar;
     public int lineNumber;
+    public boolean complete = false;
 
     public Scanner(Enumerable<Character> source) {
         this.source = source;
@@ -72,6 +73,9 @@ public class Scanner extends Enumerable<Token>
     }
 
     public Item next() {
+        if (complete) {
+            return new Item();
+        }
         try {
             State state = State.Initial;
             List<Character> tokenText = new ArrayList<Character>();
@@ -114,7 +118,8 @@ public class Scanner extends Enumerable<Token>
             if (currentChar.getStatus() == Status.End && state != State.Initial) {
                 return new Item(new CompileError("Unexpected End of Input")); // End
             } else {
-                return new Item(); // We must be at State.Initial and the end of input
+                complete = true;
+                return new Item(new Token(TokenType.Eof)); // We must be at State.Initial and the end of input
             }
         } catch (Exception ex) {
             return new Item(new CompileError(ex.getMessage()));

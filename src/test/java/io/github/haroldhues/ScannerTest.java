@@ -28,6 +28,7 @@ public class ScannerTest {
 			new Token(TokenType.RightParenthesis),
 			new Token(TokenType.LeftBrace),
 			new Token(TokenType.RightBrace),
+			new Token(TokenType.Eof),
 		})));
 	}
 
@@ -45,6 +46,7 @@ public class ScannerTest {
 			new Token(TokenType.LessThanOrEqual),
 			new Token(TokenType.GreaterThan),
 			new Token(TokenType.NotEqual), 
+			new Token(TokenType.Eof),
 		})));
 	}
 
@@ -72,6 +74,7 @@ public class ScannerTest {
 			new Token(TokenType.GreaterThanOrEqual),
 			new Token(TokenType.LessThanOrEqual),
 			new Token(TokenType.NotEqual),
+			new Token(TokenType.Eof),
 		})));
 	}
 
@@ -83,6 +86,7 @@ public class ScannerTest {
 		assertThat(result, is(Arrays.asList(new Token[] {
 			new Token(TokenType.Subtract),
 			new Token(TokenType.Multiply),
+			new Token(TokenType.Eof),
 		})));
 	}
 
@@ -119,6 +123,7 @@ public class ScannerTest {
 			new Token(TokenType.GreaterThanOrEqual),
 			new Token(TokenType.LessThanOrEqual),
 			new Token(TokenType.NotEqual),
+			new Token(TokenType.Eof),
 		})));
 	}
 	
@@ -132,6 +137,7 @@ public class ScannerTest {
 			new Token(TokenType.RightParenthesis),
 			// Comment Removed
 			new Token(TokenType.NotEqual),
+			new Token(TokenType.Eof),
 		})));
 	}
 	
@@ -143,6 +149,7 @@ public class ScannerTest {
 		assertThat(result, is(Arrays.asList(new Token[] {
 			// Comment Removed
 			new Token(TokenType.NotEqual),
+			new Token(TokenType.Eof),
 		})));
 	}
 	
@@ -157,6 +164,7 @@ public class ScannerTest {
 			// Comment Removed
 			new Token(TokenType.LeftParenthesis),
 			new Token(TokenType.RightParenthesis),
+			new Token(TokenType.Eof),
 		})));
 	}
 	
