@@ -12,12 +12,12 @@ import io.github.haroldhues.Tokens.TokenType;
 
 
 
-public class ParamNode extends SyntaxTreeNode {
+public class ParameterDeclarationNode extends SyntaxTreeNode {
 
     public TypeSpecifierNode typeSpecifier;
     public String identifier;
     public boolean isArray = false;
-    public ParamNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+    public ParameterDeclarationNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         typeSpecifier = new TypeSpecifierNode(parser, visitor);
         identifier = ((IdentifierToken)parser.parseToken(TokenType.Identifier)).identifier;
         if(parser.parseTokenIf(TokenType.LeftBracket)) {
@@ -27,7 +27,7 @@ public class ParamNode extends SyntaxTreeNode {
         visitor.accept(this);
     }
 
-    public ParamNode(TypeSpecifierNode typeSpecifier, String identifier, boolean isArray) {
+    public ParameterDeclarationNode(TypeSpecifierNode typeSpecifier, String identifier, boolean isArray) {
         this.typeSpecifier = typeSpecifier;
         this.identifier = identifier;
         this.isArray = isArray;

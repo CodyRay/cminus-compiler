@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 public class CompoundStatementNode extends SyntaxTreeNode {
 
-    public List<DeclarationSyntaxNode> localDeclarations = new ArrayList<DeclarationSyntaxNode>();
+    public List<DeclarationNode> localDeclarations = new ArrayList<DeclarationNode>();
     public List<StatementNode> statements = new ArrayList<StatementNode>();
 
     public CompoundStatementNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
@@ -25,7 +25,7 @@ public class CompoundStatementNode extends SyntaxTreeNode {
         while(parser.currentIs(TokenType.Int) || parser.currentIs(TokenType.Void)) { 
             // TODO: This will allow function declarations inside functions
             // the checker should check for this and cause errors for that.
-            localDeclarations.add(new DeclarationSyntaxNode(parser, visitor));
+            localDeclarations.add(new DeclarationNode(parser, visitor));
         }
         // Statements
         while(!parser.parseTokenIf(TokenType.RightBrace)) {
@@ -34,7 +34,7 @@ public class CompoundStatementNode extends SyntaxTreeNode {
         visitor.accept(this);
     }
 
-    public CompoundStatementNode(List<DeclarationSyntaxNode> localDeclarations, List<StatementNode> statements) {
+    public CompoundStatementNode(List<DeclarationNode> localDeclarations, List<StatementNode> statements) {
         this.localDeclarations = localDeclarations;
         this.statements = statements;
     }
@@ -45,7 +45,7 @@ public class CompoundStatementNode extends SyntaxTreeNode {
         builder.append('\n');
         
         StringBuilder indented = new StringBuilder();
-        for(DeclarationSyntaxNode declaration : localDeclarations) {
+        for(DeclarationNode declaration : localDeclarations) {
             indented.append(declaration);
             indented.append('\n');
         }

@@ -1,5 +1,7 @@
 package io.github.haroldhues.SyntaxTree;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 import io.github.haroldhues.CompileErrorException;
@@ -9,7 +11,7 @@ import io.github.haroldhues.Tokens.IntegerLiteralToken;
 import io.github.haroldhues.Tokens.Token;
 import io.github.haroldhues.Tokens.TokenType;
 
-public class DeclarationSyntaxNode extends SyntaxTreeNode {
+public class DeclarationNode extends SyntaxTreeNode {
 	public enum Type {
 		Variable, ArrayVariable, Function,
 	}
@@ -18,10 +20,10 @@ public class DeclarationSyntaxNode extends SyntaxTreeNode {
 	public String identifier;
 	public Type type;
 	public int arraySize;
-	public ParamsNode functionParams;
+    public List<ParameterDeclarationNode> functionParameters = new ArrayList<ParameterDeclarationNode>();
 	public CompoundStatementNode functionBody;
 
-	public DeclarationSyntaxNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+	public DeclarationNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
 		typeSpecifier = new TypeSpecifierNode(parser, visitor);
 		if (parser.currentIs(TokenType.Identifier)) {
 			identifier = ((IdentifierToken) parser.currentToken()).identifier;
@@ -39,7 +41,7 @@ public class DeclarationSyntaxNode extends SyntaxTreeNode {
 			parser.parseToken(TokenType.Semicolon);
 		} else if (parser.parseTokenIf(TokenType.LeftParenthesis)) {
 			type = Type.Function;
-			functionParams = new ParamsNode(parser, visitor);
+			functionParameters = parseFunctionParameters(parser, visitor);
 			parser.parseToken(TokenType.RightParenthesis);
 			functionBody = new CompoundStatementNode(parser, visitor);
 
@@ -49,22 +51,33 @@ public class DeclarationSyntaxNode extends SyntaxTreeNode {
 		visitor.accept(this);
 	}
 
-	public DeclarationSyntaxNode(TypeSpecifierNode typeSpecifier, String identifier, ParamsNode functionParams,
+	public static List<ParameterDeclarationNode> parseFunctionParameters(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+		List<ParameterDeclarationNode> parameters = new ArrayList<ParameterDeclarationNode>();
+		if(!parser.parseTokenIf(TokenType.Void)) {
+			do {
+				parameters.add(new ParameterDeclarationNode(parser, visitor));
+			}
+			while(parser.parseTokenIf(TokenType.Comma));
+		}
+		return parameters;
+	}
+
+	public DeclarationNode(TypeSpecifierNode typeSpecifier, String identifier, List<ParameterDeclarationNode> functionParameters,
 			CompoundStatementNode functionBody) {
 		type = Type.Function;
 		this.typeSpecifier = typeSpecifier;
 		this.identifier = identifier;
-		this.functionParams = functionParams;
+		this.functionParameters = functionParameters;
 		this.functionBody = functionBody;
 	}
 
-	public DeclarationSyntaxNode(TypeSpecifierNode typeSpecifier, String identifier) {
+	public DeclarationNode(TypeSpecifierNode typeSpecifier, String identifier) {
 		type = Type.Variable;
 		this.typeSpecifier = typeSpecifier;
 		this.identifier = identifier;
 	}
 
-	public DeclarationSyntaxNode(TypeSpecifierNode typeSpecifier, String identifier, int arraySize) {
+	public DeclarationNode(TypeSpecifierNode typeSpecifier, String identifier, int arraySize) {
 		type = Type.Variable;
 		this.typeSpecifier = typeSpecifier;
 		this.identifier = identifier;
@@ -84,7 +97,16 @@ public class DeclarationSyntaxNode extends SyntaxTreeNode {
 			builder.append(new Token(TokenType.Semicolon));
 		} else {
 			builder.append(new Token(TokenType.LeftParenthesis));
-			builder.append(functionParams);
+			if(functionParameters.size() > 0) {
+				String delimiter = "";
+				for(ParameterDeclarationNode param : functionParameters) {
+					builder.append(delimiter);
+					builder.append(param);
+					delimiter = new Token(TokenType.Comma).toString();
+				}
+			} else {
+				builder.append(new Token(TokenType.Void));
+			}
 			builder.append(new Token(TokenType.RightParenthesis));
 			builder.append(functionBody);
 		}
@@ -97,7 +119,7 @@ public class DeclarationSyntaxNode extends SyntaxTreeNode {
 			.property(o -> o.identifier)
 			.property(o -> o.type)
 			.property(o -> o.arraySize)
-			.property(o -> o.functionParams)
+			.property(o -> o.functionParameters)
 			.property(o -> o.functionBody)
 			.result(this, other);
 	}

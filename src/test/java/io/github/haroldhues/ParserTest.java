@@ -17,9 +17,9 @@ public class ParserTest {
 	public void testBasicProgram() throws CompileErrorException {
 		StringSource testSource = new StringSource("void main( void ) { }");
 
-		ProgramSyntaxNode expected = new ProgramSyntaxNode(new ArrayList<DeclarationSyntaxNode>(
-			Arrays.asList(new DeclarationSyntaxNode(new TypeSpecifierNode(TypeSpecifierNode.Type.Void), "main", new ParamsNode(new ArrayList<ParamNode>()), new CompoundStatementNode(
-				new ArrayList<DeclarationSyntaxNode>(), 
+		ProgramSyntaxNode expected = new ProgramSyntaxNode(new ArrayList<DeclarationNode>(
+			Arrays.asList(new DeclarationNode(new TypeSpecifierNode(TypeSpecifierNode.Type.Void), "main", new ArrayList<ParameterDeclarationNode>(), new CompoundStatementNode(
+				new ArrayList<DeclarationNode>(), 
 				new ArrayList<StatementNode>()
 			)))
 		));
@@ -39,15 +39,27 @@ public class ParserTest {
 		parser.moveNextToken(); // Load first token so the parser is ready
 		FactorNode factor = new FactorNode(parser, (e) -> {});
 		
-		
-		FactorNode expectedFactor = new FactorNode(new ExpressionNode(new SimpleExpressionNode(
+		/*	
+		FactorNode expectedFactor = new FactorNode(new ExpressionNode(new ComparableExpressionNode(
 			new AdditiveNode(
-				new AdditiveNode(new TermNode(new FactorNode(new VariableNode("array", new ExpressionNode(new SimpleExpressionNode(new AdditiveNode(new TermNode(new FactorNode(1))))))))), 
+				new AdditiveNode(new TermNode(new FactorNode(new VariableNode("array", new ExpressionNode(new ComparableExpressionNode(new AdditiveNode(new TermNode(new FactorNode(1))))))))), 
 				new Token(TokenType.Add), 
 				new TermNode(new FactorNode(new CallNode("fun", new ArrayList<ExpressionNode>(Arrays.asList(
-					new ExpressionNode(new SimpleExpressionNode(new AdditiveNode(new TermNode(new FactorNode(1))))),
-					new ExpressionNode(new SimpleExpressionNode(new AdditiveNode(new TermNode(new FactorNode(new VariableNode("x")))))),
-					new ExpressionNode(new SimpleExpressionNode(new AdditiveNode(new TermNode(new FactorNode(new VariableNode("y"))))))
+					new ExpressionNode(new ComparableExpressionNode(new AdditiveNode(new TermNode(new FactorNode(1))))),
+					new ExpressionNode(new ComparableExpressionNode(new AdditiveNode(new TermNode(new FactorNode(new VariableNode("x")))))),
+					new ExpressionNode(new ComparableExpressionNode(new AdditiveNode(new TermNode(new FactorNode(new VariableNode("y"))))))
+				)))))
+			)
+		)));
+		 */
+		FactorNode expectedFactor = new FactorNode(new ExpressionNode(new ComparableExpressionNode(
+			new AdditiveNode(
+				new AdditiveNode(new TermNode(new FactorNode(new VariableNode("array", new ExpressionNode(new ComparableExpressionNode(new AdditiveNode(new TermNode(new FactorNode(1))))))))), 
+				new Token(TokenType.Add), 
+				new TermNode(new FactorNode(new CallNode("fun", new ArrayList<ExpressionNode>(Arrays.asList(
+					new ExpressionNode(new ComparableExpressionNode(new AdditiveNode(new TermNode(new FactorNode(1))))),
+					new ExpressionNode(new ComparableExpressionNode(new AdditiveNode(new TermNode(new FactorNode(new VariableNode("x")))))),
+					new ExpressionNode(new ComparableExpressionNode(new AdditiveNode(new TermNode(new FactorNode(new VariableNode("y"))))))
 				)))))
 			)
 		)));
@@ -91,28 +103,28 @@ public class ParserTest {
 
 		assertThat(type1, is(type2));
 			
-		DeclarationSyntaxNode declaration1 = new DeclarationSyntaxNode(new TypeSpecifierNode(TypeSpecifierNode.Type.Void), "main", new ParamsNode(new ArrayList<ParamNode>()), new CompoundStatementNode(
-			new ArrayList<DeclarationSyntaxNode>(), 
+		DeclarationNode declaration1 = new DeclarationNode(new TypeSpecifierNode(TypeSpecifierNode.Type.Void), "main", new ArrayList<ParameterDeclarationNode>(), new CompoundStatementNode(
+			new ArrayList<DeclarationNode>(), 
 			new ArrayList<StatementNode>()
 		));
 
-		DeclarationSyntaxNode declaration2 = new DeclarationSyntaxNode(new TypeSpecifierNode(TypeSpecifierNode.Type.Void), "main", new ParamsNode(new ArrayList<ParamNode>()), new CompoundStatementNode(
-				new ArrayList<DeclarationSyntaxNode>(), 
+		DeclarationNode declaration2 = new DeclarationNode(new TypeSpecifierNode(TypeSpecifierNode.Type.Void), "main", new ArrayList<ParameterDeclarationNode>(), new CompoundStatementNode(
+				new ArrayList<DeclarationNode>(), 
 				new ArrayList<StatementNode>()
 			));
 
 		assertThat(declaration1, is(declaration2));
 		
-		ProgramSyntaxNode expected1 = new ProgramSyntaxNode(new ArrayList<DeclarationSyntaxNode>(
-			Arrays.asList(new DeclarationSyntaxNode(new TypeSpecifierNode(TypeSpecifierNode.Type.Void), "main", new ParamsNode(new ArrayList<ParamNode>()), new CompoundStatementNode(
-				new ArrayList<DeclarationSyntaxNode>(), 
+		ProgramSyntaxNode expected1 = new ProgramSyntaxNode(new ArrayList<DeclarationNode>(
+			Arrays.asList(new DeclarationNode(new TypeSpecifierNode(TypeSpecifierNode.Type.Void), "main", new ArrayList<ParameterDeclarationNode>(), new CompoundStatementNode(
+				new ArrayList<DeclarationNode>(), 
 				new ArrayList<StatementNode>()
 			)))
 		));
 
-		ProgramSyntaxNode expected2 = new ProgramSyntaxNode(new ArrayList<DeclarationSyntaxNode>(
-			Arrays.asList(new DeclarationSyntaxNode(new TypeSpecifierNode(TypeSpecifierNode.Type.Void), "main", new ParamsNode(new ArrayList<ParamNode>()), new CompoundStatementNode(
-				new ArrayList<DeclarationSyntaxNode>(), 
+		ProgramSyntaxNode expected2 = new ProgramSyntaxNode(new ArrayList<DeclarationNode>(
+			Arrays.asList(new DeclarationNode(new TypeSpecifierNode(TypeSpecifierNode.Type.Void), "main", new ArrayList<ParameterDeclarationNode>(), new CompoundStatementNode(
+				new ArrayList<DeclarationNode>(), 
 				new ArrayList<StatementNode>()
 			)))
 		));

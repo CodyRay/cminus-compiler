@@ -8,12 +8,12 @@ import io.github.haroldhues.Tokens.Token;
 
 
 
-public class SimpleExpressionNode extends SyntaxTreeNode {
+public class ComparableExpressionNode extends SyntaxTreeNode {
 	public AdditiveNode left;
     public Token compare; // <=, <, >=, >, ==, !=
     public AdditiveNode right;
 
-    public SimpleExpressionNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+    public ComparableExpressionNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         left = new AdditiveNode(parser, visitor);
         if(parser.currentToken().isCompareOperator()) {
             compare = parser.currentToken();
@@ -24,11 +24,11 @@ public class SimpleExpressionNode extends SyntaxTreeNode {
         visitor.accept(this);
     }
 
-    public SimpleExpressionNode(AdditiveNode expression) {
+    public ComparableExpressionNode(AdditiveNode expression) {
         this.left = expression;
     }
 
-    public SimpleExpressionNode(AdditiveNode left, Token compare, AdditiveNode right) {
+    public ComparableExpressionNode(AdditiveNode left, Token compare, AdditiveNode right) {
         this.left = left;
         this.compare = compare;
         this.right = right;

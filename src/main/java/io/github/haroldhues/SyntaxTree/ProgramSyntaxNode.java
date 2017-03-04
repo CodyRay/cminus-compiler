@@ -8,24 +8,24 @@ import io.github.haroldhues.*;
 import io.github.haroldhues.Tokens.*;
 
 public class ProgramSyntaxNode extends SyntaxTreeNode {
-    public List<DeclarationSyntaxNode> declarationList = new ArrayList<DeclarationSyntaxNode>();
+    public List<DeclarationNode> declarationList = new ArrayList<DeclarationNode>();
     
     public ProgramSyntaxNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         while(!parser.parseTokenIf(TokenType.Eof)) {
-            declarationList.add(new DeclarationSyntaxNode(parser, visitor));
+            declarationList.add(new DeclarationNode(parser, visitor));
         }
 
         visitor.accept(this);
     }
 
-    public ProgramSyntaxNode(List<DeclarationSyntaxNode> declarationList) {
+    public ProgramSyntaxNode(List<DeclarationNode> declarationList) {
         this.declarationList = declarationList;
     }
 
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        for(DeclarationSyntaxNode syntax : declarationList) {
-        	if(syntax.type == DeclarationSyntaxNode.Type.Function) {
+        for(DeclarationNode syntax : declarationList) {
+        	if(syntax.type == DeclarationNode.Type.Function) {
         		builder.append("\n");
         	}
             builder.append(syntax.toString());

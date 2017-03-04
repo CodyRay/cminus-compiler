@@ -14,13 +14,13 @@ import io.github.haroldhues.Tokens.TokenType;
 public class ExpressionNode extends SyntaxTreeNode {
     public enum Type {
         Assignment,
-        SimpleExpressionNode,
+        ComparableExpressionNode,
     }
 
     public Type type;
     public VariableNode assignmentVariable;
     public ExpressionNode assignmentExpression;
-    public SimpleExpressionNode simpleExpressionNode;
+    public ComparableExpressionNode simpleExpressionNode;
 
     public ExpressionNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         super(parser);
@@ -28,7 +28,7 @@ public class ExpressionNode extends SyntaxTreeNode {
         // There is some ambiguity between `var = expression` and `simple-expression`
         // which also can be just `var`. To resolve this we assume that it is a simple
         // expression until we see the assignment operator
-        SimpleExpressionNode expression = new SimpleExpressionNode(parser, visitCollector);
+        ComparableExpressionNode expression = new ComparableExpressionNode(parser, visitCollector);
         if(parser.parseTokenIf(TokenType.Assign)) {
             if(expression.compare != null || 
                expression.left.operation != null ||
@@ -38,14 +38,14 @@ public class ExpressionNode extends SyntaxTreeNode {
             }
             type = Type.Assignment;
             VariableNode capturedNode = expression.left.term.factor.variable;
-            // Becasuse we didn't visit when building the `SimpleExpressionNode`
+            // Becasuse we didn't visit when building the `ComparableExpressionNode`
             visitor.accept(capturedNode);
             assignmentVariable = capturedNode;
             assignmentExpression = new ExpressionNode(parser, visitor);
         } else {
             visitCollector.replay(visitor); // Now that the order is guarenteed
 
-            type = Type.SimpleExpressionNode;
+            type = Type.ComparableExpressionNode;
             simpleExpressionNode = expression;
         }
         
@@ -58,8 +58,8 @@ public class ExpressionNode extends SyntaxTreeNode {
         assignmentExpression = assignment;
     }
 
-    public ExpressionNode(SimpleExpressionNode expression) {
-        type = Type.SimpleExpressionNode;
+    public ExpressionNode(ComparableExpressionNode expression) {
+        type = Type.ComparableExpressionNode;
         simpleExpressionNode = expression;
     }
     
