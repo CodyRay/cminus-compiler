@@ -18,4 +18,32 @@ public class IterationNode extends SyntaxTreeNode {
         block = new StatementNode(parser, visitor);
         visitor.accept(this);
     }
+
+    public IterationNode(ExpressionNode condition, StatementNode block) {
+        this.condition = condition;
+        this.block = block;
+    }
+    
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("while (");
+        builder.append(condition);
+        builder.append(") ");
+        builder.append(block);
+        return builder.toString();
+    }
+
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        
+        if (!(other instanceof IterationNode)) {
+            return false;
+        }
+         
+        IterationNode that = (IterationNode) other;
+ 
+        return this.condition.equals(that.condition) && this.block.equals(that.block);
+    }
 }

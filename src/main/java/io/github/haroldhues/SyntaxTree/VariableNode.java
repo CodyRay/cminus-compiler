@@ -2,13 +2,8 @@ package io.github.haroldhues.SyntaxTree;
 
 import java.util.function.Consumer;
 
-import io.github.haroldhues.Parser;
-import io.github.haroldhues.Tokens.IdentifierToken;
-import io.github.haroldhues.Tokens.TokenType;
-
-
-
-
+import io.github.haroldhues.*;
+import io.github.haroldhues.Tokens.*;
 
 public class VariableNode extends SyntaxTreeNode {
     public String identifier;
@@ -22,17 +17,13 @@ public class VariableNode extends SyntaxTreeNode {
         visitor.accept(this);
     }
 
-    public VariableNode(String identifier, ExpressionNode arrayExpression, Consumer<SyntaxTreeNode> visitor) {
+    public VariableNode(String identifier, ExpressionNode arrayExpression) {
         this.identifier = identifier;
         this.arrayExpression = arrayExpression;
-
-        visitor.accept(this);
     }
 
-    public VariableNode(String identifier, Consumer<SyntaxTreeNode> visitor) {
+    public VariableNode(String identifier) {
         this.identifier = identifier;
-
-        visitor.accept(this);
     }
 
     public static ExpressionNode parseArrayNotation(Parser parser, Consumer<SyntaxTreeNode> visitor) throws Exception {
@@ -42,5 +33,31 @@ public class VariableNode extends SyntaxTreeNode {
             parser.parseToken(TokenType.RightBracket);
         }
         return returnValue;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(identifier);
+        builder.append(' ');
+        if(arrayExpression != null) {
+            builder.append('[');
+            builder.append(arrayExpression);
+            builder.append(']');
+        }
+        return builder.toString();
+    }
+
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        
+        if (!(other instanceof VariableNode)) {
+            return false;
+        }
+         
+        VariableNode that = (VariableNode) other;
+ 
+        return this.identifier.equals(that.identifier) && this.arrayExpression.equals(that.arrayExpression);
     }
 }

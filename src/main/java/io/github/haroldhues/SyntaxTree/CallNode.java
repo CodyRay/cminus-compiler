@@ -23,10 +23,9 @@ public class CallNode extends SyntaxTreeNode {
         visitor.accept(this);
     }
 
-    public CallNode(String identifier, List<ExpressionNode> arguments, Consumer<SyntaxTreeNode> visitor) {
+    public CallNode(String identifier, List<ExpressionNode> arguments) {
         this.identifier = identifier;
         this.arguments = arguments;
-        visitor.accept(this);
     }
 
     public static List<ExpressionNode> parseCallArgs(Parser parser, Consumer<SyntaxTreeNode> visitor) throws Exception {
@@ -39,5 +38,34 @@ public class CallNode extends SyntaxTreeNode {
             parser.parseToken(TokenType.RightParenthesis);
         }
         return args;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(identifier);
+        builder.append('(');
+        String delimiter = "";
+        for(ExpressionNode arg: arguments) {
+            builder.append(delimiter);
+            builder.append(arg);
+            delimiter = ", ";
+        }
+        builder.append(')');
+        return builder.toString();
+    }
+
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        
+        if (!(other instanceof CallNode)) {
+            return false;
+        }
+         
+        CallNode that = (CallNode) other;
+ 
+        return this.identifier.equals(that.identifier) &&
+            this.arguments.equals(that.arguments);
     }
 }

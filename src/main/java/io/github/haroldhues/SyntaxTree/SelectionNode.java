@@ -24,4 +24,39 @@ public class SelectionNode extends SyntaxTreeNode {
         }
         visitor.accept(this);
     }
+
+    public SelectionNode(ExpressionNode condition, StatementNode ifBlock, StatementNode elseBlock) {
+        this.condition = condition;
+        this.ifBlock = ifBlock;
+        this.elseBlock = elseBlock;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("if (");
+        builder.append(condition.toString());
+        builder.append(") ");
+        builder.append(condition.toString());
+        if(elseBlock != null) {
+            builder.append(" else ");
+            builder.append(elseBlock.toString());
+        }
+        return builder.toString();
+    }
+    
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        
+        if (!(other instanceof SelectionNode)) {
+            return false;
+        }
+         
+        SelectionNode that = (SelectionNode) other;
+ 
+        return this.condition.equals(that.condition) && 
+            this.ifBlock.equals(that.ifBlock) && 
+            this.elseBlock.equals(that.elseBlock);
+    }
 }

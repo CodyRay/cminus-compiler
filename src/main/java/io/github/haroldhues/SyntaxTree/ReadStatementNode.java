@@ -12,7 +12,36 @@ public class ReadStatementNode extends SyntaxTreeNode {
         if(parser.parseTokenIf(TokenType.LeftParenthesis)) {
             reference = new VariableNode(parser, visitor);
             parser.parseToken(TokenType.RightParenthesis);
+        } else {
+            reference = new VariableNode(parser, visitor);
         }
+        parser.parseToken(TokenType.Semicolon);
         visitor.accept(this);
+    }
+
+    public ReadStatementNode(VariableNode reference) {
+        this.reference = reference;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("read ");
+        builder.append(reference.toString());
+        builder.append(";");
+        return builder.toString();
+    }
+    
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        
+        if (!(other instanceof ReadStatementNode)) {
+            return false;
+        }
+         
+        ReadStatementNode that = (ReadStatementNode) other;
+ 
+        return this.reference.equals(that.reference);
     }
 }

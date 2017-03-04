@@ -51,4 +51,65 @@ public class DeclarationSyntaxNode extends SyntaxTreeNode {
         }
         visitor.accept(this);
     }
+
+    public DeclarationSyntaxNode(TypeSpecifierNode typeSpecifier, String identifier, ParamsNode functionParams, CompoundStatementNode functionBody) {
+        type = Type.Function;
+        this.typeSpecifier = typeSpecifier;
+        this.identifier = identifier;
+        this.functionParams = functionParams;
+        this.functionBody = functionBody;
+    }
+
+    public DeclarationSyntaxNode(TypeSpecifierNode typeSpecifier, String identifier) {
+        type = Type.Variable;
+        this.typeSpecifier = typeSpecifier;
+        this.identifier = identifier;
+    }
+
+    public DeclarationSyntaxNode(TypeSpecifierNode typeSpecifier, String identifier, int arraySize) {
+        type = Type.Variable;
+        this.typeSpecifier = typeSpecifier;
+        this.identifier = identifier;
+        this.arraySize = arraySize;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(typeSpecifier);
+        builder.append(' ');
+        builder.append(identifier);
+        if(type == Type.ArrayVariable) {
+            builder.append('[');
+            builder.append(arraySize);
+            builder.append(']');
+            builder.append(';');
+        } else if (type == Type.Variable) {
+            builder.append(';');
+        } else {
+            builder.append('(');
+            builder.append(functionParams);
+            builder.append(") ");
+            builder.append(functionBody);
+        }
+        return builder.toString();
+    }
+
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        
+        if (!(other instanceof DeclarationSyntaxNode)) {
+            return false;
+        }
+         
+        DeclarationSyntaxNode that = (DeclarationSyntaxNode) other;
+ 
+        return this.typeSpecifier.equals(that.typeSpecifier) &&
+            this.identifier.equals(that.identifier) &&
+            this.type.equals(that.type) &&
+            this.arraySize == that.arraySize &&
+            this.functionParams.equals(that.functionParams) &&
+            this.functionBody.equals(that.functionBody);
+    }
 }

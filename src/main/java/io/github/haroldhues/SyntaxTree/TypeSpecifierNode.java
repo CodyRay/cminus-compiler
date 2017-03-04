@@ -2,8 +2,8 @@ package io.github.haroldhues.SyntaxTree;
 
 import java.util.function.Consumer;
 
-import io.github.haroldhues.Parser;
-import io.github.haroldhues.Tokens.TokenType;
+import io.github.haroldhues.*;
+import io.github.haroldhues.Tokens.*;
 
 
 
@@ -27,5 +27,27 @@ public class TypeSpecifierNode extends SyntaxTreeNode {
         }
         
         visitor.accept(this);
+    }
+
+    public TypeSpecifierNode(Type type) {
+        this.type = type;
+    }
+
+    public String toString() {
+        return new Token(TokenType.Int).toString();
+    }
+    
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        
+        if (!(other instanceof TypeSpecifierNode)) {
+            return false;
+        }
+         
+        TypeSpecifierNode that = (TypeSpecifierNode) other;
+ 
+        return this.type != that.type;
     }
 }

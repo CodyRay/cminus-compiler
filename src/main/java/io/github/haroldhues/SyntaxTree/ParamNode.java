@@ -24,4 +24,36 @@ public class ParamNode extends SyntaxTreeNode {
         }
         visitor.accept(this);
     }
+
+    public ParamNode(TypeSpecifierNode typeSpecifier, String identifier, boolean isArray) {
+        this.typeSpecifier = typeSpecifier;
+        this.identifier = identifier;
+        this.isArray = isArray;
+    }
+    
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(typeSpecifier);
+        builder.append(' ');
+        builder.append(identifier);
+        if(isArray) {
+            builder.append('[');
+            builder.append(']');
+        }
+        return builder.toString();
+    }
+
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        
+        if (!(other instanceof ParamNode)) {
+            return false;
+        }
+         
+        ParamNode that = (ParamNode) other;
+ 
+        return this.typeSpecifier.equals(that.typeSpecifier) && this.identifier.equals(that.identifier) && this.isArray == that.isArray;
+    }
 }

@@ -16,4 +16,31 @@ public class ExpressionStatementNode extends SyntaxTreeNode {
         }
         visitor.accept(this);
     }
+
+    public ExpressionStatementNode(ExpressionNode expression) {
+        this.expression = expression;
+    }
+    
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        if(expression != null) {
+            builder.append(expression);
+        }
+        builder.append(';');
+        return builder.toString();
+    }
+
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        
+        if (!(other instanceof ExpressionStatementNode)) {
+            return false;
+        }
+         
+        ExpressionStatementNode that = (ExpressionStatementNode) other;
+ 
+        return this.expression.equals(that.expression);
+    }
 }

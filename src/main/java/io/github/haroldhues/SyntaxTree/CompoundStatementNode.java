@@ -31,4 +31,47 @@ public class CompoundStatementNode extends SyntaxTreeNode {
         }
         visitor.accept(this);
     }
+
+    public CompoundStatementNode(List<DeclarationSyntaxNode> localDeclarations, List<StatementNode> statements) {
+        this.localDeclarations = localDeclarations;
+        this.statements = statements;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append('{');
+        
+        StringBuilder indented = new StringBuilder();
+        for(DeclarationSyntaxNode declaration : localDeclarations) {
+            indented.append(declaration);
+            indented.append('\n');
+        }
+        for(StatementNode statement : statements) {
+            indented.append(statement);
+            indented.append('\n');
+        }
+        for(String line : indented.toString().split("\n")) {
+            builder.append("    ");
+            builder.append(line);
+            builder.append('\n');
+        }
+
+        builder.append('}');
+        return builder.toString();
+    }
+
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        
+        if (!(other instanceof CompoundStatementNode)) {
+            return false;
+        }
+         
+        CompoundStatementNode that = (CompoundStatementNode) other;
+ 
+        return this.localDeclarations.equals(that.localDeclarations) &&
+            this.statements.equals(that.statements);
+    }
 }

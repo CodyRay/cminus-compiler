@@ -25,16 +25,17 @@ public class ExpressionNode extends SyntaxTreeNode {
         // expression until we see the assignment operator
         SimpleExpressionNode expression = new SimpleExpressionNode(parser, visitCollector);
         if(parser.parseTokenIf(TokenType.Assign)) {
-            if(expression.compare != SimpleExpressionNode.Comparison.None || 
-               expression.left.operation != AdditiveNode.Operation.None ||
-               expression.left.term.operation != TermNode.Operation.None ||
+            if(expression.compare != null || 
+               expression.left.operation != null ||
+               expression.left.term.operation != null ||
                expression.left.term.factor.type != FactorNode.Type.Variable) {
                 throw new Exception("The left hand value of assignment must be a variable not an expression");
             }
-            VariableNode capturedNode = expression.left.term.factor.variable;
-            // Recreate the node so that it is visited
             type = Type.Assignment;
-            assignmentVariable = new VariableNode(capturedNode.identifier, capturedNode.arrayExpression, visitor);
+            VariableNode capturedNode = expression.left.term.factor.variable;
+            // Becasuse we didn't visit when building the `SimpleExpressionNode`
+            visitor.accept(capturedNode);
+            assignmentVariable = capturedNode;
             assignmentExpression = new ExpressionNode(parser, visitor);
         } else {
             visitCollector.replay(visitor); // Now that the order is guarenteed
@@ -44,6 +45,46 @@ public class ExpressionNode extends SyntaxTreeNode {
         }
         
         visitor.accept(this);
+    }
+
+    public ExpressionNode(VariableNode var, ExpressionNode assignment) {
+        type = Type.Assignment;
+        assignmentVariable = var;
+        assignmentExpression = assignment;
+    }
+
+    public ExpressionNode(SimpleExpressionNode expression) {
+        type = Type.SimpleExpressionNode;
+        simpleExpressionNode = expression;
+    }
+    
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        if(type == Type.Assignment) {
+            builder.append(assignmentVariable);
+            builder.append(" = ");
+            builder.append(assignmentExpression);
+        } else {
+            builder.append(simpleExpressionNode);
+        }
+        return builder.toString();
+    }
+
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        
+        if (!(other instanceof ExpressionNode)) {
+            return false;
+        }
+         
+        ExpressionNode that = (ExpressionNode) other;
+ 
+        return this.type.equals(that.type) &&
+            this.assignmentVariable.equals(that.assignmentVariable) &&
+            this.assignmentExpression.equals(that.assignmentExpression) &&
+            this.simpleExpressionNode.equals(that.simpleExpressionNode);
     }
 
     public class VisitorBuffer implements Consumer<SyntaxTreeNode> {

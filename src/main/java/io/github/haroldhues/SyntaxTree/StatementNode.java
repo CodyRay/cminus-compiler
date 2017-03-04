@@ -40,4 +40,22 @@ public class StatementNode extends SyntaxTreeNode {
         }
         visitor.accept(this);
     }
+
+    public String toString() {
+        return statementNode.toString();
+    }
+    
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        
+        if (!(other instanceof StatementNode)) {
+            return false;
+        }
+         
+        StatementNode that = (StatementNode) other;
+ 
+        return this.statementNode.equals(that.statementNode);
+    }
 }

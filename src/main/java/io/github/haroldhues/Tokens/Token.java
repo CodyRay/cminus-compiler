@@ -24,6 +24,40 @@ public class Token
         }
     }
 
+    public boolean isCompareOperator() {
+        switch(type) {
+            case LessThanOrEqual:
+            case LessThan:
+            case GreaterThanOrEqual:
+            case GreaterThan:
+            case Equal:
+            case NotEqual:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    public boolean isMultiplyOrDivideOperator() {
+        switch(type) {
+            case Multiply:
+            case Divide:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    public boolean isAddOrSubtractOperator() {
+        switch(type) {
+            case Add:
+            case Subtract:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     public Token(String text) {
         buildTypeMap();
         this.type = tokenTypeMap.get(text);

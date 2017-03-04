@@ -11,51 +11,60 @@ import io.github.haroldhues.Tokens.TokenType;
 
 public class TermNode extends SyntaxTreeNode {
     public TermNode term;
-    public Operation operation;
+    public Token operation;
     public FactorNode factor;
-
-    public enum Operation {
-        Multiply,
-        Divide,
-        None, // No Left Node present
-    }
 
     public TermNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws Exception {
         term = null;
-        operation = Operation.None;
+        operation = null;
         factor = new FactorNode(parser, visitor);
-        while(parser.currentIs(TokenType.Multiply) || parser.currentIs(TokenType.Divide)) {
+        while(parser.currentToken().isMultiplyOrDivideOperator()) {
             // move what we have already parsed deeper in the tree so we
             // get left associativity           
-            term = new TermNode(term, operation, factor, visitor);
-            operation = getOperationFromToken(parser.currentToken());
+            term = new TermNode(term, operation, factor);
+            visitor.accept(term); // Manually do this accept since we created the node here
+            operation = parser.currentToken();
+            parser.moveNextToken();
             factor = new FactorNode(parser, visitor);
         }
         
         visitor.accept(this);
     }
 
-    public TermNode(FactorNode factor, Consumer<SyntaxTreeNode> visitor) {
-        operation = Operation.None;
+    public TermNode(FactorNode factor) {
         this.factor = factor;
-        
-        visitor.accept(this);
     }
 
-    public TermNode(TermNode term, Operation operation, FactorNode factor, Consumer<SyntaxTreeNode> visitor) {
+    public TermNode(TermNode term, Token operation, FactorNode factor) {
         this.term = term;
         this.operation = operation;
         this.factor = factor;
-        
-        visitor.accept(this);
     }
 
-    public static Operation getOperationFromToken(Token token) throws Exception {
-        if(token.type == TokenType.Multiply) {
-            return Operation.Multiply;
-        } else if(token.type == TokenType.Divide) {
-            return Operation.Divide;
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        if(operation != null) {
+            builder.append(term);
+            builder.append(' ');
+            builder.append(operation);
         }
-        throw new Exception("Must be a multiply or divide token");
+        builder.append(factor);
+        return builder.toString();
+    }
+    
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        
+        if (!(other instanceof TermNode)) {
+            return false;
+        }
+         
+        TermNode that = (TermNode) other;
+ 
+        return this.operation.equals(that.operation) &&
+            this.term.equals(that.term) &&
+            this.factor.equals(that.factor);
     }
 }

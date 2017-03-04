@@ -2,59 +2,64 @@ package io.github.haroldhues.SyntaxTree;
 
 import java.util.function.Consumer;
 
-import io.github.haroldhues.Parser;
-import io.github.haroldhues.Tokens.Token;
-import io.github.haroldhues.Tokens.TokenType;
-
-
-
-
-
+import io.github.haroldhues.*;
+import io.github.haroldhues.Tokens.*;
 public class AdditiveNode extends SyntaxTreeNode {
     public AdditiveNode additive;
-    public Operation operation;
+    public Token operation;
     public TermNode term;
-
-    public enum Operation {
-        Add,
-        Subtract,
-        None, // No Left Node present
-    }
 
     public AdditiveNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws Exception {
         additive = null;
-        operation = Operation.None;
+        operation = null;
         term = new TermNode(parser, visitor);
-        while(parser.currentIs(TokenType.Add) || parser.currentIs(TokenType.Subtract)) {
+        while(parser.currentToken().isAddOrSubtractOperator()) {
             // move what we have already parsed deeper in the tree so we
             // get left associativity           
-            additive = new AdditiveNode(additive, operation, term, visitor);
-            operation = getOperationFromToken(parser.currentToken());
+            additive = new AdditiveNode(additive, operation, term);
+            visitor.accept(additive); // Manually visit since it was manually created
+            operation = parser.currentToken();
+            parser.moveNextToken();
             term = new TermNode(parser, visitor);
         }
         
         visitor.accept(this);
     }
 
-    public AdditiveNode(TermNode term, Consumer<SyntaxTreeNode> visitor) {
-        operation = Operation.None;
+    public AdditiveNode(TermNode term) {
         this.term = term;
-        visitor.accept(this);
     }
 
-    public AdditiveNode(AdditiveNode additive, Operation operation, TermNode term, Consumer<SyntaxTreeNode> visitor) {
+    public AdditiveNode(AdditiveNode additive, Token operation, TermNode term) {
         this.additive = additive;
         this.operation = operation;
         this.term = term;
-        visitor.accept(this);
     }
 
-    public static Operation getOperationFromToken(Token token) throws Exception {
-        if(token.type == TokenType.Add) {
-            return Operation.Add;
-        } else if(token.type == TokenType.Subtract) {
-            return Operation.Subtract;
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        if(operation != null) {
+            builder.append(additive);
+            builder.append(' ');
+            builder.append(operation);
         }
-        throw new Exception("Must be a add or subtract token");
+        builder.append(term);
+        return builder.toString();
+    }
+
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        
+        if (!(other instanceof AdditiveNode)) {
+            return false;
+        }
+         
+        AdditiveNode that = (AdditiveNode) other;
+ 
+        return this.operation.equals(that.operation) &&
+            this.term.equals(that.term) &&
+            this.additive.equals(that.additive);
     }
 }
