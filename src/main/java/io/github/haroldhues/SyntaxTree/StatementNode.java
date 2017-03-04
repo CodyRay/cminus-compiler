@@ -46,16 +46,8 @@ public class StatementNode extends SyntaxTreeNode {
     }
     
     public boolean equals(Object other) {
-        if (other == this) {
-            return true;
-        }
-        
-        if (!(other instanceof StatementNode)) {
-            return false;
-        }
-         
-        StatementNode that = (StatementNode) other;
- 
-        return this.statementNode.equals(that.statementNode);
+		return equalsBuilder(this)
+			.property(o -> o.statementNode)
+			.result(this, other);
     }
 }

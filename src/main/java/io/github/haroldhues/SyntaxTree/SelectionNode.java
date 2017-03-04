@@ -3,6 +3,7 @@ package io.github.haroldhues.SyntaxTree;
 import java.util.function.Consumer;
 
 import io.github.haroldhues.Parser;
+import io.github.haroldhues.Tokens.Token;
 import io.github.haroldhues.Tokens.TokenType;
 
 
@@ -33,30 +34,23 @@ public class SelectionNode extends SyntaxTreeNode {
 
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("if (");
+        builder.append(new Token(TokenType.If));
+        builder.append(new Token(TokenType.LeftParenthesis));
         builder.append(condition.toString());
-        builder.append(") ");
+        builder.append(new Token(TokenType.RightParenthesis));
         builder.append(condition.toString());
         if(elseBlock != null) {
-            builder.append(" else ");
+            builder.append(new Token(TokenType.Else));
             builder.append(elseBlock.toString());
         }
         return builder.toString();
     }
     
     public boolean equals(Object other) {
-        if (other == this) {
-            return true;
-        }
-        
-        if (!(other instanceof SelectionNode)) {
-            return false;
-        }
-         
-        SelectionNode that = (SelectionNode) other;
- 
-        return this.condition.equals(that.condition) && 
-            this.ifBlock.equals(that.ifBlock) && 
-            this.elseBlock.equals(that.elseBlock);
+		return equalsBuilder(this)
+			.property(o -> o.condition)
+			.property(o -> o.ifBlock)
+			.property(o -> o.elseBlock)
+			.result(this, other);
     }
 }

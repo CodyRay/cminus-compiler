@@ -35,28 +35,19 @@ public class SimpleExpressionNode extends SyntaxTreeNode {
 
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(left.toString());
+        builder.append(left);
         if (compare != null) {
-            builder.append(' ');
-            builder.append(compare.toString());
-            builder.append(right.toString());
+            builder.append(compare);
+            builder.append(right);
         }
         return builder.toString();
     }
     
     public boolean equals(Object other) {
-        if (other == this) {
-            return true;
-        }
-        
-        if (!(other instanceof SimpleExpressionNode)) {
-            return false;
-        }
-         
-        SimpleExpressionNode that = (SimpleExpressionNode) other;
- 
-        return this.left.equals(that.left) && 
-            this.right.equals(that.right) && 
-            this.compare.equals(that.compare);
+		return equalsBuilder(this)
+			.property(o -> o.left)
+			.property(o -> o.compare)
+			.property(o -> o.right)
+			.result(this, other);
     }
 }

@@ -45,7 +45,6 @@ public class TermNode extends SyntaxTreeNode {
         StringBuilder builder = new StringBuilder();
         if(operation != null) {
             builder.append(term);
-            builder.append(' ');
             builder.append(operation);
         }
         builder.append(factor);
@@ -53,18 +52,10 @@ public class TermNode extends SyntaxTreeNode {
     }
     
     public boolean equals(Object other) {
-        if (other == this) {
-            return true;
-        }
-        
-        if (!(other instanceof TermNode)) {
-            return false;
-        }
-         
-        TermNode that = (TermNode) other;
- 
-        return this.operation.equals(that.operation) &&
-            this.term.equals(that.term) &&
-            this.factor.equals(that.factor);
+		return equalsBuilder(this)
+			.property(o -> o.operation)
+			.property(o -> o.term)
+			.property(o -> o.factor)
+			.result(this, other);
     }
 }

@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 
 import io.github.haroldhues.Parser;
 import io.github.haroldhues.Tokens.IdentifierToken;
+import io.github.haroldhues.Tokens.Token;
 import io.github.haroldhues.Tokens.TokenType;
 
 import java.util.ArrayList;
@@ -43,29 +44,21 @@ public class CallNode extends SyntaxTreeNode {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(identifier);
-        builder.append('(');
+        builder.append(new Token(TokenType.LeftParenthesis));
         String delimiter = "";
         for(ExpressionNode arg: arguments) {
             builder.append(delimiter);
-            builder.append(arg);
-            delimiter = ", ";
+            builder.append(arg.toString().trim());
+            delimiter = new Token(TokenType.Comma).toString();
         }
-        builder.append(')');
+        builder.append(new Token(TokenType.RightParenthesis));
         return builder.toString();
     }
 
     public boolean equals(Object other) {
-        if (other == this) {
-            return true;
-        }
-        
-        if (!(other instanceof CallNode)) {
-            return false;
-        }
-         
-        CallNode that = (CallNode) other;
- 
-        return this.identifier.equals(that.identifier) &&
-            this.arguments.equals(that.arguments);
+		return equalsBuilder(this)
+			.property(o -> o.identifier)
+			.property(o -> o.arguments)
+			.result(this, other);
     }
 }

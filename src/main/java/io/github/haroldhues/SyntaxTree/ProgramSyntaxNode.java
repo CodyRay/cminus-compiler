@@ -25,23 +25,18 @@ public class ProgramSyntaxNode extends SyntaxTreeNode {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         for(DeclarationSyntaxNode syntax : declarationList) {
+        	if(syntax.type == DeclarationSyntaxNode.Type.Function) {
+        		builder.append("\n");
+        	}
             builder.append(syntax.toString());
-            builder.append('\n');
+            builder.append("\n");
         }
         return builder.toString();
     }
     
     public boolean equals(Object other) {
-        if (other == this) {
-            return true;
-        }
-        
-        if (!(other instanceof ProgramSyntaxNode)) {
-            return false;
-        }
-         
-        ProgramSyntaxNode that = (ProgramSyntaxNode) other;
- 
-        return this.declarationList.equals(that.declarationList);
+		return equalsBuilder(this)
+			.property(o -> o.declarationList)
+			.result(this, other);
     }
 }

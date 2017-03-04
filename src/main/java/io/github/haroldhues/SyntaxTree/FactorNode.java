@@ -82,7 +82,7 @@ public class FactorNode extends SyntaxTreeNode {
         } else if(type == Type.Expression) {
             builder.append(expression);
         } else if(type == Type.IntegerValue) {
-            builder.append(integerValue);
+            builder.append(new IntegerLiteralToken(integerValue));
         } else if(type == Type.Variable) {
             builder.append(variable);
         }
@@ -90,20 +90,12 @@ public class FactorNode extends SyntaxTreeNode {
     }
 
     public boolean equals(Object other) {
-        if (other == this) {
-            return true;
-        }
-        
-        if (!(other instanceof FactorNode)) {
-            return false;
-        }
-         
-        FactorNode that = (FactorNode) other;
-
-        return this.type == that.type &&
-            this.integerValue == that.integerValue &&
-            this.call.equals(that.call) && 
-            this.variable.equals(that.variable) && 
-            this.expression.equals(that.expression);
+		return equalsBuilder(this)
+			.property(o -> o.type)
+			.property(o -> o.integerValue)
+			.property(o -> o.call)
+			.property(o -> o.variable)
+			.property(o -> o.expression)
+			.result(this, other);
     }
 }

@@ -5,6 +5,7 @@ import java.util.Queue;
 import java.util.function.Consumer;
 
 import io.github.haroldhues.Parser;
+import io.github.haroldhues.Tokens.Token;
 import io.github.haroldhues.Tokens.TokenType;
 
 public class ExpressionNode extends SyntaxTreeNode {
@@ -62,7 +63,7 @@ public class ExpressionNode extends SyntaxTreeNode {
         StringBuilder builder = new StringBuilder();
         if(type == Type.Assignment) {
             builder.append(assignmentVariable);
-            builder.append(" = ");
+            builder.append(new Token(TokenType.Assign));
             builder.append(assignmentExpression);
         } else {
             builder.append(simpleExpressionNode);
@@ -71,20 +72,12 @@ public class ExpressionNode extends SyntaxTreeNode {
     }
 
     public boolean equals(Object other) {
-        if (other == this) {
-            return true;
-        }
-        
-        if (!(other instanceof ExpressionNode)) {
-            return false;
-        }
-         
-        ExpressionNode that = (ExpressionNode) other;
- 
-        return this.type.equals(that.type) &&
-            this.assignmentVariable.equals(that.assignmentVariable) &&
-            this.assignmentExpression.equals(that.assignmentExpression) &&
-            this.simpleExpressionNode.equals(that.simpleExpressionNode);
+		return equalsBuilder(this)
+			.property(o -> o.type)
+			.property(o -> o.assignmentVariable)
+			.property(o -> o.assignmentExpression)
+			.property(o -> o.simpleExpressionNode)
+			.result(this, other);
     }
 
     public class VisitorBuffer implements Consumer<SyntaxTreeNode> {

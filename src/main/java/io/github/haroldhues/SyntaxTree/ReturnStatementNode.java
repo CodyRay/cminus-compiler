@@ -22,23 +22,15 @@ public class ReturnStatementNode extends SyntaxTreeNode {
 
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("return ");
-        builder.append(expression.toString());
-        builder.append(";");
+        builder.append(new Token(TokenType.Return));
+        builder.append(expression.toString().trim());
+        builder.append(new Token(TokenType.Semicolon));
         return builder.toString();
     }
     
     public boolean equals(Object other) {
-        if (other == this) {
-            return true;
-        }
-        
-        if (!(other instanceof ReturnStatementNode)) {
-            return false;
-        }
-         
-        ReturnStatementNode that = (ReturnStatementNode) other;
- 
-        return this.expression.equals(that.expression);
+		return equalsBuilder(this)
+			.property(o -> o.expression)
+			.result(this, other);
     }
 }

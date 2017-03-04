@@ -37,27 +37,19 @@ public class VariableNode extends SyntaxTreeNode {
 
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(identifier);
-        builder.append(' ');
+        builder.append(new IdentifierToken(identifier));
         if(arrayExpression != null) {
-            builder.append('[');
+            builder.append(new Token(TokenType.LeftBracket));
             builder.append(arrayExpression);
-            builder.append(']');
+            builder.append(new Token(TokenType.RightBracket));
         }
         return builder.toString();
     }
 
     public boolean equals(Object other) {
-        if (other == this) {
-            return true;
-        }
-        
-        if (!(other instanceof VariableNode)) {
-            return false;
-        }
-         
-        VariableNode that = (VariableNode) other;
- 
-        return this.identifier.equals(that.identifier) && this.arrayExpression.equals(that.arrayExpression);
+        return equalsBuilder(this)
+            .property(o -> o.identifier)
+            .property(o -> o.arrayExpression)
+            .result(this, other);
     }
 }

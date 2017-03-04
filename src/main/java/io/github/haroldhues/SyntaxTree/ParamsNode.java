@@ -32,7 +32,7 @@ public class ParamsNode extends SyntaxTreeNode {
             for(ParamNode param : parameters) {
                 builder.append(delimiter);
                 builder.append(param);
-                delimiter = ", ";
+                delimiter = new Token(TokenType.Comma).toString();
             }
         } else {
             builder.append(new Token(TokenType.Void));
@@ -41,16 +41,8 @@ public class ParamsNode extends SyntaxTreeNode {
     }
 
     public boolean equals(Object other) {
-        if (other == this) {
-            return true;
-        }
-        
-        if (!(other instanceof ParamsNode)) {
-            return false;
-        }
-         
-        ParamsNode that = (ParamsNode) other;
- 
-        return this.parameters.equals(that.parameters);
+		return equalsBuilder(this)
+			.property(o -> o.parameters)
+			.result(this, other);
     }
 }

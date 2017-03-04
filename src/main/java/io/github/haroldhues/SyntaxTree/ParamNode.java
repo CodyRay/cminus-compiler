@@ -4,6 +4,7 @@ import java.util.function.Consumer;
 
 import io.github.haroldhues.Parser;
 import io.github.haroldhues.Tokens.IdentifierToken;
+import io.github.haroldhues.Tokens.Token;
 import io.github.haroldhues.Tokens.TokenType;
 
 
@@ -34,26 +35,19 @@ public class ParamNode extends SyntaxTreeNode {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(typeSpecifier);
-        builder.append(' ');
-        builder.append(identifier);
+        builder.append(identifier.trim());
         if(isArray) {
-            builder.append('[');
-            builder.append(']');
+            builder.append(new Token(TokenType.LeftBracket).toString().trim());
+            builder.append(new Token(TokenType.RightBracket).toString().trim());
         }
         return builder.toString();
     }
 
     public boolean equals(Object other) {
-        if (other == this) {
-            return true;
-        }
-        
-        if (!(other instanceof ParamNode)) {
-            return false;
-        }
-         
-        ParamNode that = (ParamNode) other;
- 
-        return this.typeSpecifier.equals(that.typeSpecifier) && this.identifier.equals(that.identifier) && this.isArray == that.isArray;
+		return equalsBuilder(this)
+			.property(o -> o.typeSpecifier)
+			.property(o -> o.identifier)
+			.property(o -> o.isArray)
+			.result(this, other);
     }
 }

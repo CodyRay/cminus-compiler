@@ -3,6 +3,7 @@ package io.github.haroldhues.SyntaxTree;
 import java.util.function.Consumer;
 
 import io.github.haroldhues.Parser;
+import io.github.haroldhues.Tokens.Token;
 import io.github.haroldhues.Tokens.TokenType;
 
 
@@ -22,23 +23,15 @@ public class WriteStatementNode extends SyntaxTreeNode {
 
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("write ");
-        builder.append(expression.toString());
-        builder.append(";");
+        builder.append(new Token(TokenType.Write));
+        builder.append(expression.toString().trim());
+        builder.append(new Token(TokenType.Semicolon));
         return builder.toString();
     }
 
     public boolean equals(Object other) {
-        if (other == this) {
-            return true;
-        }
-        
-        if (!(other instanceof WriteStatementNode)) {
-            return false;
-        }
-         
-        WriteStatementNode that = (WriteStatementNode) other;
- 
-        return this.expression.equals(that.expression);
+		return equalsBuilder(this)
+			.property(o -> o.expression)
+			.result(this, other);
     }
 }

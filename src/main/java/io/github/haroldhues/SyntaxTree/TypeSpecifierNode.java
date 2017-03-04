@@ -34,20 +34,18 @@ public class TypeSpecifierNode extends SyntaxTreeNode {
     }
 
     public String toString() {
-        return new Token(TokenType.Int).toString();
+    	if(type == Type.Int) {
+    		return new Token(TokenType.Int).toString();    		
+    	} else if (type == Type.Void) {
+    		return new Token(TokenType.Void).toString();
+    	} else {
+    		return type.toString() + " ";
+    	}
     }
     
     public boolean equals(Object other) {
-        if (other == this) {
-            return true;
-        }
-        
-        if (!(other instanceof TypeSpecifierNode)) {
-            return false;
-        }
-         
-        TypeSpecifierNode that = (TypeSpecifierNode) other;
- 
-        return this.type != that.type;
+		return equalsBuilder(this)
+			.property(o -> o.type)
+			.result(this, other);
     }
 }

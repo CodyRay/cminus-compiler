@@ -2,6 +2,7 @@ package io.github.haroldhues.SyntaxTree;
 import java.util.function.Consumer;
 
 import io.github.haroldhues.Parser;
+import io.github.haroldhues.Tokens.Token;
 import io.github.haroldhues.Tokens.TokenType;
 
 
@@ -26,24 +27,18 @@ public class IterationNode extends SyntaxTreeNode {
     
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("while (");
+        builder.append(new Token(TokenType.While));
+        builder.append(new Token(TokenType.LeftParenthesis));
         builder.append(condition);
-        builder.append(") ");
+        builder.append(new Token(TokenType.RightParenthesis));
         builder.append(block);
         return builder.toString();
     }
 
     public boolean equals(Object other) {
-        if (other == this) {
-            return true;
-        }
-        
-        if (!(other instanceof IterationNode)) {
-            return false;
-        }
-         
-        IterationNode that = (IterationNode) other;
- 
-        return this.condition.equals(that.condition) && this.block.equals(that.block);
+		return equalsBuilder(this)
+			.property(o -> o.condition)
+			.property(o -> o.block)
+			.result(this, other);
     }
 }

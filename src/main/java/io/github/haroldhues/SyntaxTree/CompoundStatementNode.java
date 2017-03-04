@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import io.github.haroldhues.Parser;
+import io.github.haroldhues.Tokens.Token;
 import io.github.haroldhues.Tokens.TokenType;
 
 import java.util.ArrayList;
@@ -39,7 +40,8 @@ public class CompoundStatementNode extends SyntaxTreeNode {
 
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append('{');
+        builder.append(new Token(TokenType.LeftBrace));
+        builder.append('\n');
         
         StringBuilder indented = new StringBuilder();
         for(DeclarationSyntaxNode declaration : localDeclarations) {
@@ -56,22 +58,14 @@ public class CompoundStatementNode extends SyntaxTreeNode {
             builder.append('\n');
         }
 
-        builder.append('}');
+        builder.append(new Token(TokenType.RightBrace));
         return builder.toString();
     }
 
     public boolean equals(Object other) {
-        if (other == this) {
-            return true;
-        }
-        
-        if (!(other instanceof CompoundStatementNode)) {
-            return false;
-        }
-         
-        CompoundStatementNode that = (CompoundStatementNode) other;
- 
-        return this.localDeclarations.equals(that.localDeclarations) &&
-            this.statements.equals(that.statements);
+		return equalsBuilder(this)
+			.property(o -> o.localDeclarations)
+			.property(o -> o.statements)
+			.result(this, other);
     }
 }

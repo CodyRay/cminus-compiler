@@ -40,7 +40,6 @@ public class AdditiveNode extends SyntaxTreeNode {
         StringBuilder builder = new StringBuilder();
         if(operation != null) {
             builder.append(additive);
-            builder.append(' ');
             builder.append(operation);
         }
         builder.append(term);
@@ -48,18 +47,10 @@ public class AdditiveNode extends SyntaxTreeNode {
     }
 
     public boolean equals(Object other) {
-        if (other == this) {
-            return true;
-        }
-        
-        if (!(other instanceof AdditiveNode)) {
-            return false;
-        }
-         
-        AdditiveNode that = (AdditiveNode) other;
- 
-        return this.operation.equals(that.operation) &&
-            this.term.equals(that.term) &&
-            this.additive.equals(that.additive);
+        return equalsBuilder(this)
+            .property(o -> o.term)
+            .property(o -> o.additive)
+            .property(o -> o.operation)
+            .result(this, other);
     }
 }
