@@ -2,6 +2,7 @@ package io.github.haroldhues.SyntaxTree;
 
 import java.util.function.Consumer;
 
+import io.github.haroldhues.CompileErrorException;
 import io.github.haroldhues.Parser;
 import io.github.haroldhues.Tokens.Token;
 
@@ -12,7 +13,7 @@ public class SimpleExpressionNode extends SyntaxTreeNode {
     public Token compare; // <=, <, >=, >, ==, !=
     public AdditiveNode right;
 
-    public SimpleExpressionNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws Exception {
+    public SimpleExpressionNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         left = new AdditiveNode(parser, visitor);
         if(parser.currentToken().isCompareOperator()) {
             compare = parser.currentToken();

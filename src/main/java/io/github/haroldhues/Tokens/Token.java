@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 public class Token 
 {
     public TokenType type;
+    private int line;
+    private int column;
 
     private static final HashMap<String, TokenType> tokenTypeMap = new HashMap<String, TokenType>();
     private static final HashMap<TokenType, String> lexemeMap = new HashMap<TokenType, String>();
@@ -15,6 +17,36 @@ public class Token
     public Token(TokenType type) {
         this.type = type;
     }
+
+    public Token(String text) {
+        buildTypeMap();
+        this.type = tokenTypeMap.get(text);
+    }
+    public Token(TokenType type, int line, int column) {
+        this.type = type;
+        this.line = line;
+        this.column = column;
+    }
+
+    public Token(String text, int line, int column) {
+        buildTypeMap();
+        this.type = tokenTypeMap.get(text);
+        this.line = line;
+        this.column = column;
+    }
+
+    public int getLine() {
+        return line;
+    }
+
+    public int getColumn() {
+        return column;
+    }
+
+    public int getLength() {
+        return toString().length() - 1;
+    }
+
     private static void buildTypeMap() {
         if (tokenTypeMap.size() == 0) {
             for(Lexeme lex: Stream.concat(Stream.of(Lexeme.reservedKeywords), Stream.of(Lexeme.symbols)).collect(Collectors.toList())) {
@@ -56,11 +88,6 @@ public class Token
             default:
                 return false;
         }
-    }
-
-    public Token(String text) {
-        buildTypeMap();
-        this.type = tokenTypeMap.get(text);
     }
 
     public String toString() {

@@ -9,8 +9,8 @@ public class StringSource extends Enumerable<Character> {
         position = -1;
     }
 
-    public Item next() {
+    public Character next() {
         position++;
-        return position >= source.length() ? new Item() : new Item(source.charAt(position));
+        return position >= source.length() ? null : source.charAt(position);
     }
 }

@@ -16,7 +16,7 @@ import static org.hamcrest.CoreMatchers.*;
 
 public class ScannerTest {
 	@Test
-	public void testFunctionDeclaration() throws Exception {
+	public void testFunctionDeclaration() throws CompileErrorException {
 		StringSource testSource = new StringSource("void nothing( void ) { }");
 		Scanner testScanner = new Scanner(testSource);
 		List<Token> result = testScanner.toList();
@@ -33,7 +33,7 @@ public class ScannerTest {
 	}
 
 	@Test
-	public void testSymbols1() throws Exception {
+	public void testSymbols1() throws CompileErrorException {
 		StringSource testSource = new StringSource("( ) { } < <= > !=");
 		Scanner testScanner = new Scanner(testSource);
 		List<Token> result = testScanner.toList();
@@ -51,7 +51,7 @@ public class ScannerTest {
 	}
 
 	@Test
-	public void testSymbols2() throws Exception {
+	public void testSymbols2() throws CompileErrorException {
 		StringSource testSource = new StringSource("()[]{}+*-/;,==><>=<=!=");
 		Scanner testScanner = new Scanner(testSource);
 		List<Token> result = testScanner.toList();
@@ -79,7 +79,7 @@ public class ScannerTest {
 	}
 
 	@Test
-	public void testSymbols3() throws Exception {
+	public void testSymbols3() throws CompileErrorException {
 		StringSource testSource = new StringSource("-*");
 		Scanner testScanner = new Scanner(testSource);
 		List<Token> result = testScanner.toList();
@@ -89,9 +89,19 @@ public class ScannerTest {
 			new Token(TokenType.Eof),
 		})));
 	}
+	
+	@Test
+	public void testLineAndColumn() throws CompileErrorException {
+		StringSource testSource = new StringSource("void \r\n nothing \r\n ( \r\n void \r\n ) { }");
+		Scanner testScanner = new Scanner(testSource);
+		List<Token> result = testScanner.toList();
+		Token brace = result.get(result.size() - 2);
+		assertThat(brace.getLine(), is(5));
+		assertThat(brace.getColumn(), is(6));
+	}
 
 	@Test
-	public void testSymbolsAndIdentifiers() throws Exception {
+	public void testSymbolsAndIdentifiers() throws CompileErrorException {
 		StringSource testSource = new StringSource("()write[read]void{ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz}+*-/42;myid,==foo>bar<int>=<=!=");
 		Scanner testScanner = new Scanner(testSource);
 		List<Token> result = testScanner.toList();
@@ -128,7 +138,7 @@ public class ScannerTest {
 	}
 	
 	@Test
-	public void testLongComment() throws Exception {
+	public void testLongComment() throws CompileErrorException {
 		StringSource testSource = new StringSource("()/*write[read]void{firstid}+*-/42;myid,==foo>bar<int>=<=*/!=");
 		Scanner testScanner = new Scanner(testSource);
 		List<Token> result = testScanner.toList();
@@ -142,7 +152,7 @@ public class ScannerTest {
 	}
 	
 	@Test
-	public void testLongCommentStars() throws Exception {
+	public void testLongCommentStars() throws CompileErrorException {
 		StringSource testSource = new StringSource("/* / *** / *** / **/!=");
 		Scanner testScanner = new Scanner(testSource);
 		List<Token> result = testScanner.toList();
@@ -154,7 +164,7 @@ public class ScannerTest {
 	}
 	
 	@Test
-	public void testInlineComment() throws Exception {
+	public void testInlineComment() throws CompileErrorException {
 		StringSource testSource = new StringSource("()///*write[read]void{firstid}+*-/42;myid,==foo>bar<int>=<=*/!=\n()");
 		Scanner testScanner = new Scanner(testSource);
 		List<Token> result = testScanner.toList();
@@ -170,9 +180,9 @@ public class ScannerTest {
 	
 	@Test
 	public void testUnexpectedInputError() {
-		StringSource testSource = new StringSource("!(invalid)");
-		Scanner testScanner = new Scanner(testSource);
 		try {
+			StringSource testSource = new StringSource("!(invalid)");
+			Scanner testScanner = new Scanner(testSource);
 			testScanner.toList();
 			fail("Exception should be thrown");
 		} catch (Exception ex) {

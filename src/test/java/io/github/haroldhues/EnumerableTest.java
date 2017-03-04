@@ -9,7 +9,7 @@ import static org.hamcrest.CoreMatchers.*;
 public class EnumerableTest
 {
     @Test
-    public void testToList() throws Exception
+    public void testToList() throws CompileErrorException
     {
         StringSource testSource = new StringSource("Hello World!");
         List<Character> result = testSource.toList();

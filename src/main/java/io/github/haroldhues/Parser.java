@@ -7,35 +7,29 @@ import io.github.haroldhues.Tokens.*;
 
 public class Parser {
     private Enumerable<Token> source;
-    private Enumerable<Token>.Item currentItem;
+    private Token currentItem;
 
     public Parser(Enumerable<Token> source) {
         this.source = source;
     }
 
-    public Token currentToken() throws Exception {
-        if(currentItem == null) {
-            currentItem = source.next();
+    public Token currentToken() throws CompileErrorException {
+        if (currentItem == null) {
+            // Theoretically, this should never happen because there is an EOF token that should happen first
+            throw new CompileErrorException("Unexpected end of file");
         }
-
-        if (currentItem.getStatus() == Enumerable.Status.Value) {
-            return currentItem.getValue();
-        } else if (currentItem.getStatus() == Enumerable.Status.End) {
-            throw new Exception("Unexpected End of Input");
-        } else {
-            throw new Exception(currentItem.getError().message);
-        }
+        return currentItem;
     }
 
-    public boolean currentIs(TokenType type) throws Exception {
+    public boolean currentIs(TokenType type) throws CompileErrorException {
         return currentToken().type == type;
     }
 
-    public void moveNextToken() {
+    public void moveNextToken() throws CompileErrorException {
         currentItem = source.next();
     }
 
-    public boolean parseTokenIf(TokenType type) throws Exception {
+    public boolean parseTokenIf(TokenType type) throws CompileErrorException {
         if(!currentIs(type)) {
             return false;
         }
@@ -43,7 +37,7 @@ public class Parser {
         return true;
     }
 
-    public Token parseToken(TokenType type) throws Exception {
+    public Token parseToken(TokenType type) throws CompileErrorException {
         if(!currentIs(type)) {
             throwExpected(type);
         }
@@ -52,7 +46,7 @@ public class Parser {
         return token;
     }
 
-    public void throwExpected(TokenType ...expected) throws Exception {
+    public void throwExpected(TokenType ...expected) throws CompileErrorException {
         StringBuilder builder = new StringBuilder();
         builder.append("Expected ");
         for(int x = 0; x < expected.length; x++) {
@@ -79,10 +73,12 @@ public class Parser {
         builder.append(" but instead found ");
         builder.append(currentToken().toString().trim());
 
-        throw new Exception(builder.toString());
+        throw new CompileErrorException(builder.toString(), currentToken().getLine(), currentToken().getColumn());
     }
 
-    public ProgramSyntaxNode parse(Consumer<SyntaxTreeNode> visitor) throws Exception {
+    public ProgramSyntaxNode parse(Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+        // Read first token into lookahead variable
+        moveNextToken();
         return new ProgramSyntaxNode(this, visitor);
     }
 }

@@ -7,7 +7,7 @@ import io.github.haroldhues.Tokens.*;
 
 public class ReturnStatementNode extends SyntaxTreeNode {
     public ExpressionNode expression;
-    public ReturnStatementNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws Exception {
+    public ReturnStatementNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         parser.parseToken(TokenType.Return);
         if(!parser.parseTokenIf(TokenType.Semicolon)) {
             expression = new ExpressionNode(parser, visitor);
@@ -22,8 +22,12 @@ public class ReturnStatementNode extends SyntaxTreeNode {
 
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(new Token(TokenType.Return));
-        builder.append(expression.toString().trim());
+        if(expression != null) {
+        	builder.append(new Token(TokenType.Return));
+        	builder.append(expression.toString().trim());        	
+        } else {
+        	builder.append(new Token(TokenType.Return).toString().trim());
+        }
         builder.append(new Token(TokenType.Semicolon));
         return builder.toString();
     }

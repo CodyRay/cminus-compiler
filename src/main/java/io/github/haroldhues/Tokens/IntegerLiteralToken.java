@@ -9,6 +9,11 @@ public class IntegerLiteralToken extends Token
         this.value = value;
     }
 
+    public IntegerLiteralToken(Integer value, int line, int column) {
+        super(TokenType.IntegerLiteral, line, column);
+        this.value = value;
+    }
+
     public String toString() {
         return value.toString() + " ";
     }

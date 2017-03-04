@@ -10,7 +10,7 @@ import io.github.haroldhues.Tokens.*;
 public class ProgramSyntaxNode extends SyntaxTreeNode {
     public List<DeclarationSyntaxNode> declarationList = new ArrayList<DeclarationSyntaxNode>();
     
-    public ProgramSyntaxNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws Exception {
+    public ProgramSyntaxNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         while(!parser.parseTokenIf(TokenType.Eof)) {
             declarationList.add(new DeclarationSyntaxNode(parser, visitor));
         }

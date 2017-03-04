@@ -2,6 +2,7 @@ package io.github.haroldhues.SyntaxTree;
 
 import java.util.function.Consumer;
 
+import io.github.haroldhues.CompileErrorException;
 import io.github.haroldhues.Parser;
 import io.github.haroldhues.Tokens.Token;
 import io.github.haroldhues.Tokens.TokenType;
@@ -14,7 +15,7 @@ public class SelectionNode extends SyntaxTreeNode {
     public ExpressionNode condition;
     public StatementNode ifBlock;
     public StatementNode elseBlock;
-    public SelectionNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws Exception {
+    public SelectionNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         parser.parseToken(TokenType.If);
         parser.parseToken(TokenType.LeftParenthesis);
         condition = new ExpressionNode(parser, visitor);
@@ -38,7 +39,7 @@ public class SelectionNode extends SyntaxTreeNode {
         builder.append(new Token(TokenType.LeftParenthesis));
         builder.append(condition.toString());
         builder.append(new Token(TokenType.RightParenthesis));
-        builder.append(condition.toString());
+        builder.append(ifBlock.toString());
         if(elseBlock != null) {
             builder.append(new Token(TokenType.Else));
             builder.append(elseBlock.toString());

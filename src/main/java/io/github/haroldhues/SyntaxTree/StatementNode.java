@@ -2,6 +2,7 @@ package io.github.haroldhues.SyntaxTree;
 
 import java.util.function.Consumer;
 
+import io.github.haroldhues.CompileErrorException;
 import io.github.haroldhues.Parser;
 import io.github.haroldhues.Tokens.TokenType;
 
@@ -22,7 +23,7 @@ public class StatementNode extends SyntaxTreeNode {
 
     public SyntaxTreeNode statementNode;
 
-    public StatementNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws Exception {
+    public StatementNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         if(parser.currentIs(TokenType.Write)) {
             statementNode = new WriteStatementNode(parser, visitor);
         } else if(parser.currentIs(TokenType.Read)) {

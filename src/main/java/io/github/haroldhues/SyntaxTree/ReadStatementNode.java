@@ -2,13 +2,14 @@ package io.github.haroldhues.SyntaxTree;
 
 import java.util.function.Consumer;
 
+import io.github.haroldhues.CompileErrorException;
 import io.github.haroldhues.Parser;
 import io.github.haroldhues.Tokens.Token;
 import io.github.haroldhues.Tokens.TokenType;
 
 public class ReadStatementNode extends SyntaxTreeNode {
     public VariableNode reference;
-    public ReadStatementNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws Exception {
+    public ReadStatementNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         parser.parseToken(TokenType.Read);
         if(parser.parseTokenIf(TokenType.LeftParenthesis)) {
             reference = new VariableNode(parser, visitor);

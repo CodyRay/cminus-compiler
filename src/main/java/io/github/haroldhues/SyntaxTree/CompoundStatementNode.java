@@ -3,6 +3,7 @@ package io.github.haroldhues.SyntaxTree;
 import java.util.List;
 import java.util.function.Consumer;
 
+import io.github.haroldhues.CompileErrorException;
 import io.github.haroldhues.Parser;
 import io.github.haroldhues.Tokens.Token;
 import io.github.haroldhues.Tokens.TokenType;
@@ -18,7 +19,7 @@ public class CompoundStatementNode extends SyntaxTreeNode {
     public List<DeclarationSyntaxNode> localDeclarations = new ArrayList<DeclarationSyntaxNode>();
     public List<StatementNode> statements = new ArrayList<StatementNode>();
 
-    public CompoundStatementNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws Exception {
+    public CompoundStatementNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         parser.parseToken(TokenType.LeftBrace);
         // Local Declarations
         while(parser.currentIs(TokenType.Int) || parser.currentIs(TokenType.Void)) { 

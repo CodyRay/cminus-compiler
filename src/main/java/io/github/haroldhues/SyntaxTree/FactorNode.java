@@ -2,6 +2,7 @@ package io.github.haroldhues.SyntaxTree;
 
 import java.util.function.Consumer;
 
+import io.github.haroldhues.CompileErrorException;
 import io.github.haroldhues.Parser;
 import io.github.haroldhues.Tokens.IdentifierToken;
 import io.github.haroldhues.Tokens.IntegerLiteralToken;
@@ -26,7 +27,7 @@ public class FactorNode extends SyntaxTreeNode {
     public VariableNode variable;
     public ExpressionNode expression;
 
-    public FactorNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws Exception {
+    public FactorNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         if(parser.currentIs(TokenType.IntegerLiteral)) {
             type = Type.IntegerValue;
             Token token = parser.parseToken(TokenType.IntegerLiteral);
@@ -80,7 +81,9 @@ public class FactorNode extends SyntaxTreeNode {
         if(type == Type.Call) {
             builder.append(call);
         } else if(type == Type.Expression) {
+        	builder.append(new Token(TokenType.LeftParenthesis));
             builder.append(expression);
+        	builder.append(new Token(TokenType.RightParenthesis));
         } else if(type == Type.IntegerValue) {
             builder.append(new IntegerLiteralToken(integerValue));
         } else if(type == Type.Variable) {

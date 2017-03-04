@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class ParamsNode extends SyntaxTreeNode {
     public List<ParamNode> parameters = new ArrayList<ParamNode>();
 
-    public ParamsNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws Exception {
+    public ParamsNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         if(!parser.parseTokenIf(TokenType.Void)) {
             do {
                 parameters.add(new ParamNode(parser, visitor));

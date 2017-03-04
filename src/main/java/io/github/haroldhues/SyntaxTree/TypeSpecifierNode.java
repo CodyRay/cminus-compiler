@@ -17,7 +17,7 @@ public class TypeSpecifierNode extends SyntaxTreeNode {
 
     public Type type;
 
-    public TypeSpecifierNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws Exception {
+    public TypeSpecifierNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         if(parser.parseTokenIf(TokenType.Int)) {
             type = Type.Int;
         } else if (parser.parseTokenIf(TokenType.Void)) {

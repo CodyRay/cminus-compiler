@@ -3,10 +3,8 @@ package io.github.haroldhues.SyntaxTree;
 import java.util.List;
 import java.util.function.Consumer;
 
-import io.github.haroldhues.Parser;
-import io.github.haroldhues.Tokens.IdentifierToken;
-import io.github.haroldhues.Tokens.Token;
-import io.github.haroldhues.Tokens.TokenType;
+import io.github.haroldhues.*;
+import io.github.haroldhues.Tokens.*;
 
 import java.util.ArrayList;
 
@@ -18,7 +16,7 @@ public class CallNode extends SyntaxTreeNode {
     public String identifier;
     public List<ExpressionNode> arguments;
 
-    public CallNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws Exception {
+    public CallNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         identifier = ((IdentifierToken)parser.parseToken(TokenType.Identifier)).identifier;
         arguments = parseCallArgs(parser, visitor);
         visitor.accept(this);
@@ -29,7 +27,7 @@ public class CallNode extends SyntaxTreeNode {
         this.arguments = arguments;
     }
 
-    public static List<ExpressionNode> parseCallArgs(Parser parser, Consumer<SyntaxTreeNode> visitor) throws Exception {
+    public static List<ExpressionNode> parseCallArgs(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         List<ExpressionNode> args = new ArrayList<ExpressionNode>();
         parser.parseToken(TokenType.LeftParenthesis);
         if(!parser.parseTokenIf(TokenType.RightParenthesis)) {
@@ -44,7 +42,7 @@ public class CallNode extends SyntaxTreeNode {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(identifier);
-        builder.append(new Token(TokenType.LeftParenthesis));
+        builder.append(new Token(TokenType.LeftParenthesis).toString().trim());
         String delimiter = "";
         for(ExpressionNode arg: arguments) {
             builder.append(delimiter);

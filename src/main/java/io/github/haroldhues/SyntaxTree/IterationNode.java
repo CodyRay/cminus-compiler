@@ -1,6 +1,7 @@
 package io.github.haroldhues.SyntaxTree;
 import java.util.function.Consumer;
 
+import io.github.haroldhues.CompileErrorException;
 import io.github.haroldhues.Parser;
 import io.github.haroldhues.Tokens.Token;
 import io.github.haroldhues.Tokens.TokenType;
@@ -11,7 +12,7 @@ public class IterationNode extends SyntaxTreeNode {
     public ExpressionNode condition;
     public StatementNode block;
 
-    public IterationNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws Exception {
+    public IterationNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         parser.parseToken(TokenType.While);
         parser.parseToken(TokenType.LeftParenthesis);
         condition = new ExpressionNode(parser, visitor);

@@ -9,7 +9,7 @@ public class VariableNode extends SyntaxTreeNode {
     public String identifier;
     public ExpressionNode arrayExpression;
     
-    public VariableNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws Exception {
+    public VariableNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         IdentifierToken idToken = (IdentifierToken)parser.parseToken(TokenType.Identifier);
         identifier = idToken.identifier;
         arrayExpression = parseArrayNotation(parser, visitor);
@@ -26,7 +26,7 @@ public class VariableNode extends SyntaxTreeNode {
         this.identifier = identifier;
     }
 
-    public static ExpressionNode parseArrayNotation(Parser parser, Consumer<SyntaxTreeNode> visitor) throws Exception {
+    public static ExpressionNode parseArrayNotation(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         ExpressionNode returnValue = null;
         if(parser.parseTokenIf(TokenType.LeftBracket)) {
             returnValue = new ExpressionNode(parser, visitor);
@@ -37,11 +37,13 @@ public class VariableNode extends SyntaxTreeNode {
 
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(new IdentifierToken(identifier));
         if(arrayExpression != null) {
+            builder.append(identifier);
             builder.append(new Token(TokenType.LeftBracket));
             builder.append(arrayExpression);
             builder.append(new Token(TokenType.RightBracket));
+        } else {
+            builder.append(new IdentifierToken(identifier));
         }
         return builder.toString();
     }

@@ -2,6 +2,7 @@ package io.github.haroldhues.SyntaxTree;
 
 import java.util.function.Consumer;
 
+import io.github.haroldhues.CompileErrorException;
 import io.github.haroldhues.Parser;
 import io.github.haroldhues.Tokens.IdentifierToken;
 import io.github.haroldhues.Tokens.IntegerLiteralToken;
@@ -20,7 +21,7 @@ public class DeclarationSyntaxNode extends SyntaxTreeNode {
 	public ParamsNode functionParams;
 	public CompoundStatementNode functionBody;
 
-	public DeclarationSyntaxNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws Exception {
+	public DeclarationSyntaxNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
 		typeSpecifier = new TypeSpecifierNode(parser, visitor);
 		if (parser.currentIs(TokenType.Identifier)) {
 			identifier = ((IdentifierToken) parser.currentToken()).identifier;

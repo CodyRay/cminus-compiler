@@ -1,9 +1,9 @@
 package io.github.haroldhues.SyntaxTree;
 import java.util.function.Consumer;
 
+import io.github.haroldhues.CompileErrorException;
 import io.github.haroldhues.Parser;
 import io.github.haroldhues.Tokens.Token;
-import io.github.haroldhues.Tokens.TokenType;
 
 
 
@@ -14,7 +14,7 @@ public class TermNode extends SyntaxTreeNode {
     public Token operation;
     public FactorNode factor;
 
-    public TermNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws Exception {
+    public TermNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         term = null;
         operation = null;
         factor = new FactorNode(parser, visitor);

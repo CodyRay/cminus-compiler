@@ -4,6 +4,9 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.function.Consumer;
 
+import io.github.haroldhues.CompileErrorException;
+
+
 import io.github.haroldhues.Parser;
 import io.github.haroldhues.Tokens.Token;
 import io.github.haroldhues.Tokens.TokenType;
@@ -19,7 +22,8 @@ public class ExpressionNode extends SyntaxTreeNode {
     public ExpressionNode assignmentExpression;
     public SimpleExpressionNode simpleExpressionNode;
 
-    public ExpressionNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws Exception {
+    public ExpressionNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+        super(parser);
         VisitorBuffer visitCollector = new VisitorBuffer();
         // There is some ambiguity between `var = expression` and `simple-expression`
         // which also can be just `var`. To resolve this we assume that it is a simple
@@ -30,7 +34,7 @@ public class ExpressionNode extends SyntaxTreeNode {
                expression.left.operation != null ||
                expression.left.term.operation != null ||
                expression.left.term.factor.type != FactorNode.Type.Variable) {
-                throw new Exception("The left hand value of assignment must be a variable not an expression");
+                throw new CompileErrorException("The left hand of an assignment must be a variable reference", getLine(), getColumn());
             }
             type = Type.Assignment;
             VariableNode capturedNode = expression.left.term.factor.variable;

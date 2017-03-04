@@ -9,7 +9,7 @@ public class AdditiveNode extends SyntaxTreeNode {
     public Token operation;
     public TermNode term;
 
-    public AdditiveNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws Exception {
+    public AdditiveNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         additive = null;
         operation = null;
         term = new TermNode(parser, visitor);
