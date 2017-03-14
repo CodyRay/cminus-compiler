@@ -9,8 +9,10 @@ public class Parser {
     private Enumerable<Token> source;
     private Token currentItem;
 
-    public Parser(Enumerable<Token> source) {
+    public Parser(Enumerable<Token> source) throws CompileErrorException {
         this.source = source;
+        // Read first token into lookahead variable
+        moveNextToken();
     }
 
     public Token currentToken() throws CompileErrorException {
@@ -76,9 +78,7 @@ public class Parser {
         throw new CompileErrorException(builder.toString(), currentToken().getLine(), currentToken().getColumn());
     }
 
-    public ProgramSyntaxNode parse(Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
-        // Read first token into lookahead variable
-        moveNextToken();
-        return new ProgramSyntaxNode(this, visitor);
+    public RootNode parse(Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+        return RootNode.parse(this, visitor);
     }
 }

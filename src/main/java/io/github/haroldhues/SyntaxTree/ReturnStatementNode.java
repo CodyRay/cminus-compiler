@@ -5,19 +5,28 @@ import java.util.function.Consumer;
 import io.github.haroldhues.*;
 import io.github.haroldhues.Tokens.*;
 
-public class ReturnStatementNode extends SyntaxTreeNode {
+public class ReturnStatementNode extends StatementNode {
     public ExpressionNode expression;
-    public ReturnStatementNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+
+    public static ReturnStatementNode parse(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         parser.parseToken(TokenType.Return);
+        ExpressionNode expression = null;
         if(!parser.parseTokenIf(TokenType.Semicolon)) {
-            expression = new ExpressionNode(parser, visitor);
+            expression = ExpressionNode.parse(parser, visitor);
             parser.parseToken(TokenType.Semicolon);
         }
-        visitor.accept(this);
+
+        ReturnStatementNode statement = new ReturnStatementNode(expression);
+        visitor.accept(statement);
+        return statement;
     }
 
     public ReturnStatementNode(ExpressionNode expressionNode) {
         this.expression = expressionNode;
+    }
+
+    public StatementNode.Type statementType() {
+        return StatementNode.Type.Return;
     }
 
     public String toString() {

@@ -13,7 +13,9 @@ import io.github.haroldhues.Tokens.TokenType;
 
 public class DeclarationNode extends SyntaxTreeNode {
 	public enum Type {
-		Variable, ArrayVariable, Function,
+		Variable, 
+		ArrayVariable, 
+		Function,
 	}
 
 	public TypeSpecifierNode typeSpecifier;
@@ -23,39 +25,42 @@ public class DeclarationNode extends SyntaxTreeNode {
     public List<ParameterDeclarationNode> functionParameters = new ArrayList<ParameterDeclarationNode>();
 	public CompoundStatementNode functionBody;
 
-	public DeclarationNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
-		typeSpecifier = new TypeSpecifierNode(parser, visitor);
-		if (parser.currentIs(TokenType.Identifier)) {
-			identifier = ((IdentifierToken) parser.currentToken()).identifier;
-			parser.moveNextToken();
-		} else {
+	public static DeclarationNode parse(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+		TypeSpecifierNode typeSpecifier = TypeSpecifierNode.parse(parser, visitor);
+		String identifier;
+		if (!parser.currentIs(TokenType.Identifier)) {
 			parser.throwExpected(TokenType.Identifier);
 		}
-
+		identifier = ((IdentifierToken) parser.currentToken()).identifier;
+		parser.moveNextToken();
+		
+		DeclarationNode declaration;
 		if (parser.parseTokenIf(TokenType.Semicolon)) {
-			type = Type.Variable;
+			declaration = new DeclarationNode(typeSpecifier, identifier);
 		} else if (parser.parseTokenIf(TokenType.LeftBracket)) {
-			type = Type.ArrayVariable;
-			arraySize = ((IntegerLiteralToken) parser.parseToken(TokenType.IntegerLiteral)).value;
+			int arraySize = ((IntegerLiteralToken) parser.parseToken(TokenType.IntegerLiteral)).value;
 			parser.parseToken(TokenType.RightBracket);
 			parser.parseToken(TokenType.Semicolon);
+			declaration = new DeclarationNode(typeSpecifier, identifier, arraySize);
 		} else if (parser.parseTokenIf(TokenType.LeftParenthesis)) {
-			type = Type.Function;
-			functionParameters = parseFunctionParameters(parser, visitor);
+			List<ParameterDeclarationNode> functionParameters = parseFunctionParameters(parser, visitor);
 			parser.parseToken(TokenType.RightParenthesis);
-			functionBody = new CompoundStatementNode(parser, visitor);
-
+			CompoundStatementNode functionBody = CompoundStatementNode.parse(parser, visitor);
+			declaration = new DeclarationNode(typeSpecifier, identifier, functionParameters, functionBody);
 		} else {
 			parser.throwExpected(TokenType.Semicolon, TokenType.LeftBracket, TokenType.LeftParenthesis);
+			declaration = null; // Unreachable Code
 		}
-		visitor.accept(this);
+
+		visitor.accept(declaration);
+		return declaration;
 	}
 
 	public static List<ParameterDeclarationNode> parseFunctionParameters(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
 		List<ParameterDeclarationNode> parameters = new ArrayList<ParameterDeclarationNode>();
 		if(!parser.parseTokenIf(TokenType.Void)) {
 			do {
-				parameters.add(new ParameterDeclarationNode(parser, visitor));
+				parameters.add(ParameterDeclarationNode.parse(parser, visitor));
 			}
 			while(parser.parseTokenIf(TokenType.Comma));
 		}
@@ -78,7 +83,7 @@ public class DeclarationNode extends SyntaxTreeNode {
 	}
 
 	public DeclarationNode(TypeSpecifierNode typeSpecifier, String identifier, int arraySize) {
-		type = Type.Variable;
+		type = Type.ArrayVariable;
 		this.typeSpecifier = typeSpecifier;
 		this.identifier = identifier;
 		this.arraySize = arraySize;

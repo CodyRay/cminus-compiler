@@ -7,22 +7,31 @@ import io.github.haroldhues.Parser;
 import io.github.haroldhues.Tokens.Token;
 import io.github.haroldhues.Tokens.TokenType;
 
-public class ReadStatementNode extends SyntaxTreeNode {
-    public VariableNode reference;
-    public ReadStatementNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+public class ReadStatementNode extends StatementNode {
+    public VariableExpressionNode reference;
+    
+    public static ReadStatementNode parse(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         parser.parseToken(TokenType.Read);
+        VariableExpressionNode reference;
         if(parser.parseTokenIf(TokenType.LeftParenthesis)) {
-            reference = new VariableNode(parser, visitor);
+            reference = VariableExpressionNode.parse(parser, visitor);
             parser.parseToken(TokenType.RightParenthesis);
         } else {
-            reference = new VariableNode(parser, visitor);
+            reference = VariableExpressionNode.parse(parser, visitor);
         }
         parser.parseToken(TokenType.Semicolon);
-        visitor.accept(this);
+
+        ReadStatementNode statement = new ReadStatementNode(reference);
+        visitor.accept(statement);
+        return statement;
     }
 
-    public ReadStatementNode(VariableNode reference) {
+    public ReadStatementNode(VariableExpressionNode reference) {
         this.reference = reference;
+    }
+
+    public StatementNode.Type statementType() {
+        return StatementNode.Type.Read;
     }
 
     public String toString() {

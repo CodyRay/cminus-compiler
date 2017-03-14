@@ -5,34 +5,41 @@ import java.util.function.Consumer;
 import io.github.haroldhues.*;
 import io.github.haroldhues.Tokens.*;
 
-public class VariableNode extends SyntaxTreeNode {
+public class VariableExpressionNode extends ExpressionNode {
     public String identifier;
     public ExpressionNode arrayExpression;
     
-    public VariableNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+    public static VariableExpressionNode parse(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         IdentifierToken idToken = (IdentifierToken)parser.parseToken(TokenType.Identifier);
-        identifier = idToken.identifier;
-        arrayExpression = parseArrayNotation(parser, visitor);
+        String identifier = idToken.identifier;
+        ExpressionNode arrayExpression = parseArrayNotation(parser, visitor);
 
-        visitor.accept(this);
+        VariableExpressionNode expression = new VariableExpressionNode(identifier, arrayExpression);
+        visitor.accept(expression);
+        return expression;
     }
 
-    public VariableNode(String identifier, ExpressionNode arrayExpression) {
+    public VariableExpressionNode(String identifier, ExpressionNode arrayExpression) {
         this.identifier = identifier;
         this.arrayExpression = arrayExpression;
     }
 
-    public VariableNode(String identifier) {
+    public VariableExpressionNode(String identifier) {
         this.identifier = identifier;
+        this.arrayExpression = null;
     }
 
     public static ExpressionNode parseArrayNotation(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         ExpressionNode returnValue = null;
         if(parser.parseTokenIf(TokenType.LeftBracket)) {
-            returnValue = new ExpressionNode(parser, visitor);
+            returnValue = ExpressionNode.parse(parser, visitor);
             parser.parseToken(TokenType.RightBracket);
         }
         return returnValue;
+    }
+
+    public ExpressionNode.Type expressionType() {
+        return ExpressionNode.Type.Variable;
     }
 
     public String toString() {

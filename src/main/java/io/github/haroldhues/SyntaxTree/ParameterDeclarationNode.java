@@ -17,14 +17,20 @@ public class ParameterDeclarationNode extends SyntaxTreeNode {
     public TypeSpecifierNode typeSpecifier;
     public String identifier;
     public boolean isArray = false;
-    public ParameterDeclarationNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
-        typeSpecifier = new TypeSpecifierNode(parser, visitor);
-        identifier = ((IdentifierToken)parser.parseToken(TokenType.Identifier)).identifier;
+
+    public static ParameterDeclarationNode parse(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+        TypeSpecifierNode typeSpecifier = TypeSpecifierNode.parse(parser, visitor);
+        String identifier = ((IdentifierToken)parser.parseToken(TokenType.Identifier)).identifier;
+        boolean isArray = false;
+
         if(parser.parseTokenIf(TokenType.LeftBracket)) {
             isArray = true;
             parser.parseToken(TokenType.RightBracket);
         }
-        visitor.accept(this);
+
+        ParameterDeclarationNode declaration = new ParameterDeclarationNode(typeSpecifier, identifier, isArray);
+        visitor.accept(declaration);
+        return declaration;
     }
 
     public ParameterDeclarationNode(TypeSpecifierNode typeSpecifier, String identifier, boolean isArray) {

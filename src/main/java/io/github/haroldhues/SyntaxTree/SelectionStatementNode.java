@@ -11,26 +11,36 @@ import io.github.haroldhues.Tokens.TokenType;
 
 
 
-public class SelectionNode extends SyntaxTreeNode {
+public class SelectionStatementNode extends StatementNode {
     public ExpressionNode condition;
     public StatementNode ifBlock;
     public StatementNode elseBlock;
-    public SelectionNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+
+    public static SelectionStatementNode parse(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         parser.parseToken(TokenType.If);
         parser.parseToken(TokenType.LeftParenthesis);
-        condition = new ExpressionNode(parser, visitor);
+        ExpressionNode condition = ExpressionNode.parse(parser, visitor);
         parser.parseToken(TokenType.RightParenthesis);
-        ifBlock = new StatementNode(parser, visitor);
+        StatementNode ifBlock = StatementNode.parse(parser, visitor);
+        
+        StatementNode elseBlock = null;
         if(parser.parseTokenIf(TokenType.Else)) {
-            elseBlock = new StatementNode(parser, visitor);
+            elseBlock = StatementNode.parse(parser, visitor);
         }
-        visitor.accept(this);
+
+        SelectionStatementNode statement = new SelectionStatementNode(condition, ifBlock, elseBlock);
+        visitor.accept(statement);
+        return statement;
     }
 
-    public SelectionNode(ExpressionNode condition, StatementNode ifBlock, StatementNode elseBlock) {
+    public SelectionStatementNode(ExpressionNode condition, StatementNode ifBlock, StatementNode elseBlock) {
         this.condition = condition;
         this.ifBlock = ifBlock;
         this.elseBlock = elseBlock;
+    }
+
+    public StatementNode.Type statementType() {
+        return StatementNode.Type.Selection;
     }
 
     public String toString() {

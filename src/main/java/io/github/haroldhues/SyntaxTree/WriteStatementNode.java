@@ -8,18 +8,24 @@ import io.github.haroldhues.Tokens.Token;
 import io.github.haroldhues.Tokens.TokenType;
 
 
-public class WriteStatementNode extends SyntaxTreeNode {
+public class WriteStatementNode extends StatementNode {
     public ExpressionNode expression;
-    public WriteStatementNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+    public static WriteStatementNode parse(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         parser.parseToken(TokenType.Write);
-        expression = new ExpressionNode(parser, visitor);
+        ExpressionNode expression = ExpressionNode.parse(parser, visitor);
         parser.parseToken(TokenType.Semicolon);
 
-        visitor.accept(this);
+        WriteStatementNode statement = new WriteStatementNode(expression);
+        visitor.accept(statement);
+        return statement;
     }
 
     public WriteStatementNode(ExpressionNode expression) {
         this.expression = expression;
+    }
+
+    public StatementNode.Type statementType() {
+        return StatementNode.Type.Write;
     }
 
     public String toString() {

@@ -7,18 +7,21 @@ import java.util.function.Consumer;
 import io.github.haroldhues.*;
 import io.github.haroldhues.Tokens.*;
 
-public class ProgramSyntaxNode extends SyntaxTreeNode {
+public class RootNode extends SyntaxTreeNode {
     public List<DeclarationNode> declarationList = new ArrayList<DeclarationNode>();
     
-    public ProgramSyntaxNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+    public static RootNode parse(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+        List<DeclarationNode> declarationList = new ArrayList<DeclarationNode>();
         while(!parser.parseTokenIf(TokenType.Eof)) {
-            declarationList.add(new DeclarationNode(parser, visitor));
+            declarationList.add(DeclarationNode.parse(parser, visitor));
         }
 
-        visitor.accept(this);
+        RootNode root = new RootNode(declarationList);
+        visitor.accept(root);
+        return root;
     }
 
-    public ProgramSyntaxNode(List<DeclarationNode> declarationList) {
+    public RootNode(List<DeclarationNode> declarationList) {
         this.declarationList = declarationList;
     }
 

@@ -8,22 +8,29 @@ import io.github.haroldhues.Tokens.TokenType;
 
 
 
-public class IterationNode extends SyntaxTreeNode {
+public class IterationStatementNode extends StatementNode {
     public ExpressionNode condition;
     public StatementNode block;
 
-    public IterationNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+    public static IterationStatementNode parse(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         parser.parseToken(TokenType.While);
         parser.parseToken(TokenType.LeftParenthesis);
-        condition = new ExpressionNode(parser, visitor);
+        ExpressionNode condition = ExpressionNode.parse(parser, visitor);
         parser.parseToken(TokenType.RightParenthesis);
-        block = new StatementNode(parser, visitor);
-        visitor.accept(this);
+        StatementNode block = StatementNode.parse(parser, visitor);
+
+        IterationStatementNode statement = new IterationStatementNode(condition, block);
+        visitor.accept(statement);
+        return statement;
     }
 
-    public IterationNode(ExpressionNode condition, StatementNode block) {
+    public IterationStatementNode(ExpressionNode condition, StatementNode block) {
         this.condition = condition;
         this.block = block;
+    }
+
+    public StatementNode.Type statementType() {
+        return StatementNode.Type.Iteration;
     }
     
     public String toString() {

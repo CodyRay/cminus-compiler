@@ -10,7 +10,7 @@ import io.github.haroldhues.Tokens.TokenType;
 
 
 
-public class StatementNode extends SyntaxTreeNode {
+public abstract class StatementNode extends SyntaxTreeNode {
     public enum Type {
         Expression,
         Compound,
@@ -21,34 +21,23 @@ public class StatementNode extends SyntaxTreeNode {
         Write
     }
 
-    public SyntaxTreeNode statementNode;
+    public abstract Type statementType();
 
-    public StatementNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+    public static StatementNode parse(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         if(parser.currentIs(TokenType.Write)) {
-            statementNode = new WriteStatementNode(parser, visitor);
+            return WriteStatementNode.parse(parser, visitor);
         } else if(parser.currentIs(TokenType.Read)) {
-            statementNode = new ReadStatementNode(parser, visitor);
+            return ReadStatementNode.parse(parser, visitor);
         } else if(parser.currentIs(TokenType.Return)) {
-            statementNode = new ReturnStatementNode(parser, visitor);
+            return ReturnStatementNode.parse(parser, visitor);
         } else if(parser.currentIs(TokenType.While)) {
-            statementNode = new IterationNode(parser, visitor);
+            return IterationStatementNode.parse(parser, visitor);
         } else if(parser.currentIs(TokenType.If)) {
-            statementNode = new SelectionNode(parser, visitor);
+            return SelectionStatementNode.parse(parser, visitor);
         } else if(parser.currentIs(TokenType.LeftBrace)) {
-            statementNode = new CompoundStatementNode(parser, visitor);
+            return CompoundStatementNode.parse(parser, visitor);
         } else {
-            statementNode = new ExpressionStatementNode(parser, visitor);
+            return ExpressionStatementNode.parse(parser, visitor);
         }
-        visitor.accept(this);
-    }
-
-    public String toString() {
-        return statementNode.toString();
-    }
-    
-    public boolean equals(Object other) {
-		return equalsBuilder(this)
-			.property(o -> o.statementNode)
-			.result(this, other);
     }
 }

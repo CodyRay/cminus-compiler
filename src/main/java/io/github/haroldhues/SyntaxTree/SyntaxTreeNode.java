@@ -4,35 +4,13 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.function.Function;
 
-import io.github.haroldhues.CompileErrorException;
-
-
-import io.github.haroldhues.Parser;
-
 
 
 
 
 public abstract class SyntaxTreeNode 
 {
-    private int line;
-    private int column;
-
     public SyntaxTreeNode() { }
-
-    public SyntaxTreeNode(Parser parser) throws CompileErrorException {
-        this.line = parser.currentToken().getLine();
-        this.column = parser.currentToken().getColumn();
-    }
-
-    public int getLine() {
-        return line;
-    }
-
-    public int getColumn() {
-        return column;
-    }
-
     public static <T extends Object> EqualsBuilder<T> equalsBuilder(T tis) {
         return new EqualsBuilder<T>();
     }

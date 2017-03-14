@@ -17,16 +17,20 @@ public class TypeSpecifierNode extends SyntaxTreeNode {
 
     public Type type;
 
-    public TypeSpecifierNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+    public static TypeSpecifierNode parse(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+        Type type;
         if(parser.parseTokenIf(TokenType.Int)) {
             type = Type.Int;
         } else if (parser.parseTokenIf(TokenType.Void)) {
             type = Type.Void;
         } else {
             parser.throwExpected(TokenType.Int, TokenType.Void);
+            type = null; // Unreachable
         }
         
-        visitor.accept(this);
+        TypeSpecifierNode node = new TypeSpecifierNode(type);
+        visitor.accept(node);
+        return node;
     }
 
     public TypeSpecifierNode(Type type) {

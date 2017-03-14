@@ -7,20 +7,28 @@ import io.github.haroldhues.Parser;
 import io.github.haroldhues.Tokens.Token;
 import io.github.haroldhues.Tokens.TokenType;
 
-public class ExpressionStatementNode extends SyntaxTreeNode {
+public class ExpressionStatementNode extends StatementNode {
 	public ExpressionNode expression;
 
-	public ExpressionStatementNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+	public static ExpressionStatementNode parse(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+		ExpressionNode expression = null;
 		if (!parser.parseTokenIf(TokenType.Semicolon)) {
-			expression = new ExpressionNode(parser, visitor);
+			expression = ExpressionNode.parse(parser, visitor);
 			parser.parseToken(TokenType.Semicolon);
 		}
-		visitor.accept(this);
+		
+		ExpressionStatementNode statement = new ExpressionStatementNode(expression);
+		visitor.accept(statement);
+		return statement;
 	}
 
 	public ExpressionStatementNode(ExpressionNode expression) {
 		this.expression = expression;
 	}
+
+    public StatementNode.Type statementType() {
+        return StatementNode.Type.Expression;
+    }
 
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

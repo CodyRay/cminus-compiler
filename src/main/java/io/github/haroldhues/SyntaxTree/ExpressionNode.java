@@ -1,99 +1,109 @@
 package io.github.haroldhues.SyntaxTree;
 
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.function.Consumer;
 
 import io.github.haroldhues.CompileErrorException;
 
 
 import io.github.haroldhues.Parser;
+import io.github.haroldhues.Tokens.IdentifierToken;
 import io.github.haroldhues.Tokens.Token;
 import io.github.haroldhues.Tokens.TokenType;
 
-public class ExpressionNode extends SyntaxTreeNode {
+public abstract class ExpressionNode extends SyntaxTreeNode {
     public enum Type {
-        Assignment,
-        ComparableExpressionNode,
+        NestedExpression, 
+        Variable, 
+        Call, 
+        Literal, 
+        BinaryOperator
     }
 
-    public Type type;
-    public VariableNode assignmentVariable;
-    public ExpressionNode assignmentExpression;
-    public ComparableExpressionNode simpleExpressionNode;
-
-    public ExpressionNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
-        super(parser);
-        VisitorBuffer visitCollector = new VisitorBuffer();
+    public static ExpressionNode parse(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         // There is some ambiguity between `var = expression` and `simple-expression`
         // which also can be just `var`. To resolve this we assume that it is a simple
         // expression until we see the assignment operator
-        ComparableExpressionNode expression = new ComparableExpressionNode(parser, visitCollector);
-        if(parser.parseTokenIf(TokenType.Assign)) {
-            if(expression.compare != null || 
-               expression.left.operation != null ||
-               expression.left.term.operation != null ||
-               expression.left.term.factor.type != FactorNode.Type.Variable) {
-                throw new CompileErrorException("The left hand of an assignment must be a variable reference", getLine(), getColumn());
+        ExpressionNode expression = parseComparableExpressionNode(parser, visitor);
+        if(parser.currentIs(TokenType.Assign)) {
+            if(expression.expressionType() != Type.Variable) {
+                throw new CompileErrorException("The left hand of an assignment must be a variable reference", parser.currentToken().getLine(), parser.currentToken().getColumn());
             }
-            type = Type.Assignment;
-            VariableNode capturedNode = expression.left.term.factor.variable;
-            // Becasuse we didn't visit when building the `ComparableExpressionNode`
-            visitor.accept(capturedNode);
-            assignmentVariable = capturedNode;
-            assignmentExpression = new ExpressionNode(parser, visitor);
-        } else {
-            visitCollector.replay(visitor); // Now that the order is guarenteed
-
-            type = Type.ComparableExpressionNode;
-            simpleExpressionNode = expression;
+            ExpressionNode variable = expression;
+            Token assignment = parser.parseToken(TokenType.Assign);
+            expression = ExpressionNode.parse(parser, visitor);
+            expression = new BinaryExpressionNode(variable, assignment, expression);
+            visitor.accept(expression); // Since it was manually created
         }
-        
-        visitor.accept(this);
+        return expression;
+    }
+     
+    public static ExpressionNode parseComparableExpressionNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+        ExpressionNode expression = parseAdditiveNode(parser, visitor);
+        if(parser.currentToken().isCompareOperator()) {
+            Token compare = parser.currentToken();
+            // Already been looked at for the comparison
+            parser.moveNextToken();
+            ExpressionNode rightExpression = parseAdditiveNode(parser, visitor);
+            expression = new BinaryExpressionNode(expression, compare, rightExpression);
+            visitor.accept(expression); // Manually visit since it was manually created
+        }
+        return expression;
     }
 
-    public ExpressionNode(VariableNode var, ExpressionNode assignment) {
-        type = Type.Assignment;
-        assignmentVariable = var;
-        assignmentExpression = assignment;
-    }
-
-    public ExpressionNode(ComparableExpressionNode expression) {
-        type = Type.ComparableExpressionNode;
-        simpleExpressionNode = expression;
+    public static ExpressionNode parseAdditiveNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+        ExpressionNode expression = parseTermNode(parser, visitor);
+        while(parser.currentToken().isAddOrSubtractOperator()) {
+            Token operation = parser.currentToken();
+            parser.moveNextToken();
+            ExpressionNode term = parseTermNode(parser, visitor);
+            // move what we have already parsed deeper in the tree so we
+            // get left associativity           
+            expression = new BinaryExpressionNode(expression, operation, term);
+            visitor.accept(expression); // Manually visit since it was manually created
+        }
+        return expression;
     }
     
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        if(type == Type.Assignment) {
-            builder.append(assignmentVariable);
-            builder.append(new Token(TokenType.Assign));
-            builder.append(assignmentExpression);
-        } else {
-            builder.append(simpleExpressionNode);
+    public static ExpressionNode parseTermNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+        ExpressionNode expression = parseFactorNode(parser, visitor); // Singleton
+        while(parser.currentToken().isMultiplyOrDivideOperator()) {
+            Token operation = parser.currentToken();
+            parser.moveNextToken();
+            ExpressionNode factor = parseFactorNode(parser, visitor);
+            // move what we have already parsed deeper in the tree so we
+            // get left associativity           
+            expression = new BinaryExpressionNode(expression, operation, factor);
+            visitor.accept(expression); // Manually do this accept since we manually created the node here
         }
-        return builder.toString();
+        return expression;
     }
 
-    public boolean equals(Object other) {
-		return equalsBuilder(this)
-			.property(o -> o.type)
-			.property(o -> o.assignmentVariable)
-			.property(o -> o.assignmentExpression)
-			.property(o -> o.simpleExpressionNode)
-			.result(this, other);
-    }
-
-    public class VisitorBuffer implements Consumer<SyntaxTreeNode> {
-        public Queue<SyntaxTreeNode> nodes = new LinkedList<SyntaxTreeNode>();
-        public void accept(SyntaxTreeNode node) {
-            nodes.add(node);
-        }
-
-        public void replay(Consumer<SyntaxTreeNode> visitor) {
-            while(nodes.size() > 0) {
-                visitor.accept(nodes.remove());
+    public static ExpressionNode parseFactorNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+        if(parser.currentIs(TokenType.IntegerLiteral)) {
+            return LiteralExpressionNode.parse(parser, visitor);
+        } else if (parser.parseTokenIf(TokenType.LeftParenthesis)) {
+            ExpressionNode expression = new NestedExpressionNode(ExpressionNode.parse(parser, visitor));
+            parser.parseToken(TokenType.RightParenthesis);
+            return expression;
+        } else if (parser.currentIs(TokenType.Identifier)) {
+            Token token = parser.parseToken(TokenType.Identifier);
+            String identifier = ((IdentifierToken)token).identifier;
+            // This one is a bit weird because identifier is the start of both a
+            // variable nod and a callnode, so we have to parse ahead a bit here
+            if(parser.currentIs(TokenType.LeftParenthesis)) {
+                CallExpressionNode call = new CallExpressionNode(identifier, CallExpressionNode.parseCallArgs(parser, visitor));
+                visitor.accept(call); // Manually accept because we manually created
+                return call;
+            } else {
+                VariableExpressionNode variable = new VariableExpressionNode(identifier, VariableExpressionNode.parseArrayNotation(parser, visitor));
+                visitor.accept(variable); // Manually accept because we manually created
+                return variable;
             }
+        } else {
+            parser.throwExpected(TokenType.IntegerLiteral, TokenType.LeftParenthesis, TokenType.Identifier);
+            return null; //Unreachable
         }
     }
+
+    public abstract ExpressionNode.Type expressionType();
 }

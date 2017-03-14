@@ -12,17 +12,20 @@ import java.util.ArrayList;
 
 
 
-public class CallNode extends SyntaxTreeNode {
+public class CallExpressionNode extends ExpressionNode {
     public String identifier;
     public List<ExpressionNode> arguments;
 
-    public CallNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
-        identifier = ((IdentifierToken)parser.parseToken(TokenType.Identifier)).identifier;
-        arguments = parseCallArgs(parser, visitor);
-        visitor.accept(this);
+    public static CallExpressionNode parse(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+        String identifier = ((IdentifierToken)parser.parseToken(TokenType.Identifier)).identifier;
+        List<ExpressionNode> arguments = parseCallArgs(parser, visitor);
+        
+        CallExpressionNode expression = new CallExpressionNode(identifier, arguments);
+        visitor.accept(expression);
+        return expression;
     }
 
-    public CallNode(String identifier, List<ExpressionNode> arguments) {
+    public CallExpressionNode(String identifier, List<ExpressionNode> arguments) {
         this.identifier = identifier;
         this.arguments = arguments;
     }
@@ -32,7 +35,7 @@ public class CallNode extends SyntaxTreeNode {
         parser.parseToken(TokenType.LeftParenthesis);
         if(!parser.parseTokenIf(TokenType.RightParenthesis)) {
             do {
-                args.add(new ExpressionNode(parser, visitor));
+                args.add(ExpressionNode.parse(parser, visitor));
             } while(parser.parseTokenIf(TokenType.Comma));
             parser.parseToken(TokenType.RightParenthesis);
         }
@@ -58,5 +61,9 @@ public class CallNode extends SyntaxTreeNode {
 			.property(o -> o.identifier)
 			.property(o -> o.arguments)
 			.result(this, other);
+    }
+
+    public ExpressionNode.Type expressionType() {
+        return ExpressionNode.Type.Call;
     }
 }
