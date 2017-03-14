@@ -300,11 +300,25 @@ Output:
 
 # Compiler
 
-## Parser
+## Scanner
 
-The parser is a finite state machine based of of the regular expressions for the tokens.
+The scanner is a finite state machine based of of the regular expressions for the tokens.
 
-![Parser Automata](ParserAutomata.jpg)
+![Scanner Automata](ScannerAutomata.jpg)
 
 The code uses the same numbers as the diagram, but the different states are represented by an enumeration.
+
+## Parser
+
+The parser uses a recursive decent algorithm based on the context free grammar at the end of Compiler Construction: Principles and Practice
+
+![Syntax 1](Syntax1.jpg)
+
+![Syntax 2](Syntax2.jpg)
+
+![Syntax 3](Syntax3.jpg)
+
+![Syntax 4](Syntax4.jpg)
+
+
 
