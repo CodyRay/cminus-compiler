@@ -25,6 +25,7 @@ public class DeclarationNode extends SyntaxTreeNode {
 	public CompoundStatementNode functionBody;
 
 	public static DeclarationNode parse(Parser parser) throws CompileErrorException {
+        Location location = parser.currentLocation();
 		TypeSpecifierNode typeSpecifier = TypeSpecifierNode.parse(parser);
 		String identifier;
 		if (!parser.currentIs(TokenType.Identifier)) {
@@ -35,17 +36,17 @@ public class DeclarationNode extends SyntaxTreeNode {
 		
 		DeclarationNode declaration;
 		if (parser.parseTokenIf(TokenType.Semicolon)) {
-			declaration = new DeclarationNode(parser.currentLocation(), typeSpecifier, identifier);
+			declaration = new DeclarationNode(location, typeSpecifier, identifier);
 		} else if (parser.parseTokenIf(TokenType.LeftBracket)) {
 			int arraySize = ((IntegerLiteralToken) parser.parseToken(TokenType.IntegerLiteral)).value;
 			parser.parseToken(TokenType.RightBracket);
 			parser.parseToken(TokenType.Semicolon);
-			declaration = new DeclarationNode(parser.currentLocation(), typeSpecifier, identifier, arraySize);
+			declaration = new DeclarationNode(location, typeSpecifier, identifier, arraySize);
 		} else if (parser.parseTokenIf(TokenType.LeftParenthesis)) {
 			List<ParameterDeclarationNode> functionParameters = parseFunctionParameters(parser);
 			parser.parseToken(TokenType.RightParenthesis);
 			CompoundStatementNode functionBody = CompoundStatementNode.parse(parser);
-			declaration = new DeclarationNode(parser.currentLocation(), typeSpecifier, identifier, functionParameters, functionBody);
+			declaration = new DeclarationNode(location, typeSpecifier, identifier, functionParameters, functionBody);
 		} else {
 			parser.throwExpected(TokenType.Semicolon, TokenType.LeftBracket, TokenType.LeftParenthesis);
 			declaration = null; // Unreachable Code

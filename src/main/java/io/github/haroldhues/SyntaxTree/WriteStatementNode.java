@@ -10,12 +10,12 @@ import io.github.haroldhues.Tokens.TokenType;
 public class WriteStatementNode extends StatementNode {
     public ExpressionNode expression;
     public static WriteStatementNode parse(Parser parser) throws CompileErrorException {
+        Location location = parser.currentLocation();
         parser.parseToken(TokenType.Write);
         ExpressionNode expression = ExpressionNode.parse(parser);
         parser.parseToken(TokenType.Semicolon);
 
-        WriteStatementNode statement = new WriteStatementNode(parser.currentLocation(), expression);
-        return statement;
+        return new WriteStatementNode(location, expression);
     }
 
     public WriteStatementNode(Location location, ExpressionNode expression) {

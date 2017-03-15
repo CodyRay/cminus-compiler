@@ -23,14 +23,14 @@ public class SymbolTable {
 
     public void insert(String identifier, Entry entry) throws CompileErrorException {
         if(lookup.containsKey(identifier)) {
-            throw new CompileErrorException("'" + identifier + "' has already been declared in this scope");
+            throw new CompileErrorException("'" + identifier + "' has already been declared in this scope", entry.getLocation());
         }
         lookup.put(identifier, entry);
     }
 
 
-    public Entry get(String identifier) throws CompileErrorException {
-        return lookup.containsKey(identifier) ? lookup.get(identifier) : outerScope.get(identifier);
+        public Entry get(String identifier, Location location) throws CompileErrorException {
+        return lookup.containsKey(identifier) ? lookup.get(identifier) : outerScope.get(identifier, location);
     }
 
     public String toString() {
@@ -61,7 +61,16 @@ public class SymbolTable {
             Function,
         }
 
+        public Entry(Location location) {
+            this.location = location;
+        }
+
+        public Location getLocation() {
+            return location;
+        }
+
         public String identifier;
+        private Location location;
 
         public abstract Type getType();
     }
@@ -70,7 +79,8 @@ public class SymbolTable {
         public ReturnType returnType;
         public List<Parameter> parameters;
 
-        public FunctionEntry(String identifier, ReturnType returnType, List<Parameter> parameters) {
+        public FunctionEntry(Location location, String identifier, ReturnType returnType, List<Parameter> parameters) {
+            super(location);
             this.identifier = identifier;
             this.returnType = returnType;
             this.parameters = parameters;
@@ -125,7 +135,8 @@ public class SymbolTable {
             return Type.Variable;
         }
 
-        public VariableEntry(String identifier) {
+        public VariableEntry(Location location, String identifier) {
+            super(location);
             this.identifier = identifier;
         }
 
@@ -142,7 +153,8 @@ public class SymbolTable {
     public static class ArrayVariableEntry extends Entry {
         public Integer size = null;
 
-        public ArrayVariableEntry(String identifier, Integer size) {
+        public ArrayVariableEntry(Location location, String identifier, Integer size) {
+            super(location);
             this.identifier = identifier;
             this.size = size;
         }
@@ -169,8 +181,8 @@ public class SymbolTable {
             throw new UnsupportedOperationException("Cannot insert into root symbol table");
         }
 
-        public Entry get(String identifier) throws CompileErrorException {
-            throw new CompileErrorException("'" + identifier + "' has not been defined");
+        public Entry get(String identifier, Location location) throws CompileErrorException {
+            throw new CompileErrorException("'" + identifier + "' has not been defined", location);
         }
     }
 }

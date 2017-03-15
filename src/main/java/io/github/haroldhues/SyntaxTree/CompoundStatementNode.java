@@ -23,6 +23,7 @@ public class CompoundStatementNode extends StatementNode {
     public List<StatementNode> statements = new ArrayList<StatementNode>();
 
     public static CompoundStatementNode parse(Parser parser) throws CompileErrorException {
+        Location location = parser.currentLocation();
         List<DeclarationNode> localDeclarations = new ArrayList<DeclarationNode>();
         List<StatementNode> statements = new ArrayList<StatementNode>();
         parser.parseToken(TokenType.LeftBrace);
@@ -43,8 +44,7 @@ public class CompoundStatementNode extends StatementNode {
             statements.add(StatementNode.parse(parser));
         }
         
-        CompoundStatementNode statement = new CompoundStatementNode(parser.currentLocation(), localDeclarations, statements);
-        return statement;
+        return new CompoundStatementNode(location, localDeclarations, statements);
     }
 
     public CompoundStatementNode(Location location, List<DeclarationNode> localDeclarations, List<StatementNode> statements) {

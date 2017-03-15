@@ -13,13 +13,13 @@ public class RootNode extends SyntaxTreeNode {
     public List<DeclarationNode> declarationList = new ArrayList<DeclarationNode>();
     
     public static RootNode parse(Parser parser) throws CompileErrorException {
+        Location location = parser.currentLocation();
         List<DeclarationNode> declarationList = new ArrayList<DeclarationNode>();
         while(!parser.parseTokenIf(TokenType.Eof)) {
             declarationList.add(DeclarationNode.parse(parser));
         }
 
-        RootNode root = new RootNode(parser.currentLocation(), declarationList);
-        return root;
+        return new RootNode(location, declarationList);
     }
 
     public RootNode(Location location, List<DeclarationNode> declarationList) {

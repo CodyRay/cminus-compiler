@@ -8,12 +8,12 @@ public class VariableExpressionNode extends ExpressionNode {
     public ExpressionNode arrayExpression;
     
     public static VariableExpressionNode parse(Parser parser) throws CompileErrorException {
+        Location location = parser.currentLocation();
         IdentifierToken idToken = (IdentifierToken)parser.parseToken(TokenType.Identifier);
         String identifier = idToken.identifier;
         ExpressionNode arrayExpression = parseArrayNotation(parser);
 
-        VariableExpressionNode expression = new VariableExpressionNode(parser.currentLocation(), identifier, arrayExpression);
-        return expression;
+        return new VariableExpressionNode(location, identifier, arrayExpression);
     }
 
     public VariableExpressionNode(Location location, String identifier, ExpressionNode arrayExpression) {

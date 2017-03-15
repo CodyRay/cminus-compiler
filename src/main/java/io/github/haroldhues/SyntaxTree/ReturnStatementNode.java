@@ -7,6 +7,7 @@ public class ReturnStatementNode extends StatementNode {
     public ExpressionNode expression;
 
     public static ReturnStatementNode parse(Parser parser) throws CompileErrorException {
+        Location location = parser.currentLocation();
         parser.parseToken(TokenType.Return);
         ExpressionNode expression = null;
         if(!parser.parseTokenIf(TokenType.Semicolon)) {
@@ -14,8 +15,7 @@ public class ReturnStatementNode extends StatementNode {
             parser.parseToken(TokenType.Semicolon);
         }
 
-        ReturnStatementNode statement = new ReturnStatementNode(parser.currentLocation(), expression);
-        return statement;
+        return new ReturnStatementNode(location, expression);
     }
 
     public ReturnStatementNode(Location location, ExpressionNode expressionNode) {

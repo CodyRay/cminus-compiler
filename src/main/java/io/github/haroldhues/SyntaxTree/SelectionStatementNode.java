@@ -16,6 +16,7 @@ public class SelectionStatementNode extends StatementNode {
     public StatementNode elseBlock;
 
     public static SelectionStatementNode parse(Parser parser) throws CompileErrorException {
+        Location location = parser.currentLocation();
         parser.parseToken(TokenType.If);
         parser.parseToken(TokenType.LeftParenthesis);
         ExpressionNode condition = ExpressionNode.parse(parser);
@@ -27,8 +28,7 @@ public class SelectionStatementNode extends StatementNode {
             elseBlock = StatementNode.parse(parser);
         }
 
-        SelectionStatementNode statement = new SelectionStatementNode(parser.currentLocation(), condition, ifBlock, elseBlock);
-        return statement;
+        return new SelectionStatementNode(location, condition, ifBlock, elseBlock);
     }
 
     public SelectionStatementNode(Location location, ExpressionNode condition, StatementNode ifBlock, StatementNode elseBlock) {

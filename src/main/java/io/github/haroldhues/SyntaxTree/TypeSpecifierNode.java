@@ -16,6 +16,7 @@ public class TypeSpecifierNode extends SyntaxTreeNode {
     public Type type;
 
     public static TypeSpecifierNode parse(Parser parser) throws CompileErrorException {
+        Location location = parser.currentLocation();
         Type type;
         if(parser.parseTokenIf(TokenType.Int)) {
             type = Type.Int;
@@ -26,8 +27,7 @@ public class TypeSpecifierNode extends SyntaxTreeNode {
             type = null; // Unreachable
         }
         
-        TypeSpecifierNode node = new TypeSpecifierNode(parser.currentLocation(), type);
-        return node;
+        return new TypeSpecifierNode(location, type);
     }
 
     public TypeSpecifierNode(Location location, Type type) {

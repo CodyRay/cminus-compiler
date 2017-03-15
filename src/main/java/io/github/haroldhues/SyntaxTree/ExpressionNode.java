@@ -38,7 +38,7 @@ public abstract class ExpressionNode extends SyntaxTreeNode {
             }
             VariableExpressionNode variable = (VariableExpressionNode)expression;
             expression = ExpressionNode.parse(parser);
-            expression = new AssignmentExpressionNode(parser.currentLocation(), variable, expression);
+            expression = new AssignmentExpressionNode(variable.getLocation(), variable, expression);
         }
         return expression;
     }
@@ -50,7 +50,7 @@ public abstract class ExpressionNode extends SyntaxTreeNode {
             // Already been looked at for the comparison
             parser.moveNextToken();
             ExpressionNode rightExpression = parseAdditiveNode(parser);
-            expression = new BinaryExpressionNode(parser.currentLocation(), expression, compare, rightExpression);
+            expression = new BinaryExpressionNode(expression.getLocation(), expression, compare, rightExpression);
         }
         return expression;
     }
@@ -63,7 +63,7 @@ public abstract class ExpressionNode extends SyntaxTreeNode {
             ExpressionNode term = parseTermNode(parser);
             // move what we have already parsed deeper in the tree so we
             // get left associativity           
-            expression = new BinaryExpressionNode(parser.currentLocation(), expression, operation, term);
+            expression = new BinaryExpressionNode(expression.getLocation(), expression, operation, term);
         }
         return expression;
     }
@@ -76,16 +76,17 @@ public abstract class ExpressionNode extends SyntaxTreeNode {
             ExpressionNode factor = parseFactorNode(parser);
             // move what we have already parsed deeper in the tree so we
             // get left associativity           
-            expression = new BinaryExpressionNode(parser.currentLocation(), expression, operation, factor);
+            expression = new BinaryExpressionNode(expression.getLocation(), expression, operation, factor);
         }
         return expression;
     }
 
     public static ExpressionNode parseFactorNode(Parser parser) throws CompileErrorException {
+        Location location = parser.currentLocation();
         if(parser.currentIs(TokenType.IntegerLiteral)) {
             return LiteralExpressionNode.parse(parser);
         } else if (parser.parseTokenIf(TokenType.LeftParenthesis)) {
-            ExpressionNode expression = new NestedExpressionNode(parser.currentLocation(), ExpressionNode.parse(parser));
+            ExpressionNode expression = new NestedExpressionNode(location, ExpressionNode.parse(parser));
             parser.parseToken(TokenType.RightParenthesis);
             return expression;
         } else if (parser.currentIs(TokenType.Identifier)) {
@@ -94,10 +95,10 @@ public abstract class ExpressionNode extends SyntaxTreeNode {
             // This one is a bit weird because identifier is the start of both a
             // variable nod and a callnode, so we have to parse ahead a bit here
             if(parser.currentIs(TokenType.LeftParenthesis)) {
-                CallExpressionNode call = new CallExpressionNode(parser.currentLocation(), identifier, CallExpressionNode.parseCallArgs(parser));
+                CallExpressionNode call = new CallExpressionNode(location, identifier, CallExpressionNode.parseCallArgs(parser));
                 return call;
             } else {
-                VariableExpressionNode variable = new VariableExpressionNode(parser.currentLocation(), identifier, VariableExpressionNode.parseArrayNotation(parser));
+                VariableExpressionNode variable = new VariableExpressionNode(location, identifier, VariableExpressionNode.parseArrayNotation(parser));
                 return variable;
             }
         } else {

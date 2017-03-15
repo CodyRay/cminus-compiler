@@ -10,6 +10,7 @@ public class ReadStatementNode extends StatementNode {
     public VariableExpressionNode reference;
     
     public static ReadStatementNode parse(Parser parser) throws CompileErrorException {
+        Location location = parser.currentLocation();
         parser.parseToken(TokenType.Read);
         VariableExpressionNode reference;
         if(parser.parseTokenIf(TokenType.LeftParenthesis)) {
@@ -20,8 +21,7 @@ public class ReadStatementNode extends StatementNode {
         }
         parser.parseToken(TokenType.Semicolon);
 
-        ReadStatementNode statement = new ReadStatementNode(parser.currentLocation(), reference);
-        return statement;
+        return new ReadStatementNode(location, reference);
     }
 
     public ReadStatementNode(Location location, VariableExpressionNode reference) {

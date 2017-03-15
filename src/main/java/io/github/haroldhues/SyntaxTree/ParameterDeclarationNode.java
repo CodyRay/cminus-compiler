@@ -18,6 +18,7 @@ public class ParameterDeclarationNode extends SyntaxTreeNode {
     public boolean isArray = false;
 
     public static ParameterDeclarationNode parse(Parser parser) throws CompileErrorException {
+        Location location = parser.currentLocation();
         TypeSpecifierNode typeSpecifier = TypeSpecifierNode.parse(parser);
         String identifier = ((IdentifierToken)parser.parseToken(TokenType.Identifier)).identifier;
         boolean isArray = false;
@@ -27,8 +28,7 @@ public class ParameterDeclarationNode extends SyntaxTreeNode {
             parser.parseToken(TokenType.RightBracket);
         }
 
-        ParameterDeclarationNode declaration = new ParameterDeclarationNode(parser.currentLocation(), typeSpecifier, identifier, isArray);
-        return declaration;
+        return new ParameterDeclarationNode(location, typeSpecifier, identifier, isArray);
     }
 
     public ParameterDeclarationNode(Location location, TypeSpecifierNode typeSpecifier, String identifier, boolean isArray) {

@@ -7,11 +7,11 @@ public class LiteralExpressionNode extends ExpressionNode {
     public Integer value;
     
     public static LiteralExpressionNode parse(Parser parser) throws CompileErrorException {
+        Location location = parser.currentLocation();
         Token token = parser.parseToken(TokenType.IntegerLiteral);
         Integer value = ((IntegerLiteralToken)token).value;
 
-        LiteralExpressionNode expression = new LiteralExpressionNode(parser.currentLocation(), value);
-        return expression;
+        return new LiteralExpressionNode(location, value);
     }
     public LiteralExpressionNode(Location location, Integer value) {
     	super(location);

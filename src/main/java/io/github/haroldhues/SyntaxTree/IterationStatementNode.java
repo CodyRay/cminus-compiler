@@ -12,14 +12,14 @@ public class IterationStatementNode extends StatementNode {
     public StatementNode block;
 
     public static IterationStatementNode parse(Parser parser) throws CompileErrorException {
+        Location location = parser.currentLocation();
         parser.parseToken(TokenType.While);
         parser.parseToken(TokenType.LeftParenthesis);
         ExpressionNode condition = ExpressionNode.parse(parser);
         parser.parseToken(TokenType.RightParenthesis);
         StatementNode block = StatementNode.parse(parser);
 
-        IterationStatementNode statement = new IterationStatementNode(parser.currentLocation(), condition, block);
-        return statement;
+        return new IterationStatementNode(location, condition, block);
     }
 
     public IterationStatementNode(Location location, ExpressionNode condition, StatementNode block) {

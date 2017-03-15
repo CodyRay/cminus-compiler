@@ -10,14 +10,14 @@ public class ExpressionStatementNode extends StatementNode {
 	public ExpressionNode expression;
 
 	public static ExpressionStatementNode parse(Parser parser) throws CompileErrorException {
+        Location location = parser.currentLocation();
 		ExpressionNode expression = null;
 		if (!parser.parseTokenIf(TokenType.Semicolon)) {
 			expression = ExpressionNode.parse(parser);
 			parser.parseToken(TokenType.Semicolon);
 		}
 		
-		ExpressionStatementNode statement = new ExpressionStatementNode(parser.currentLocation(), expression);
-		return statement;
+		return new ExpressionStatementNode(location, expression);
 	}
 
 	public ExpressionStatementNode(Location location, ExpressionNode expression) {
