@@ -74,8 +74,9 @@ public class Parser {
             }
         }
 
-        builder.append(" but instead found ");
+        builder.append(" but instead found '");
         builder.append(currentToken().toString().trim());
+        builder.append("'");
 
         throw new CompileErrorException(builder.toString(), currentToken().getLocation());
     }

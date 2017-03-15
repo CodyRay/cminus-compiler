@@ -14,14 +14,6 @@ public class CallExpressionNode extends ExpressionNode {
     public String identifier;
     public List<ExpressionNode> arguments;
 
-    public static CallExpressionNode parse(Parser parser) throws CompileErrorException {
-        Location location = parser.currentLocation();
-        String identifier = ((IdentifierToken)parser.parseToken(TokenType.Identifier)).identifier;
-        List<ExpressionNode> arguments = parseCallArgs(parser);
-        
-        return new CallExpressionNode(location, identifier, arguments);
-    }
-
     public CallExpressionNode(Location location, String identifier, List<ExpressionNode> arguments) {
     	super(location);
         this.identifier = identifier;

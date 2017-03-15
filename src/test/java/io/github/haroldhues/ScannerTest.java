@@ -189,4 +189,16 @@ public class ScannerTest {
 			assertThat(ex.getMessage(), CoreMatchers.containsString("Unexpected character"));
 		}
 	}
+	
+	@Test
+	public void testUnexpectedEndOfInputError() {
+		try {
+			StringSource testSource = new StringSource("/* Unterminated Comment");
+			Scanner testScanner = new Scanner(testSource);
+			testScanner.toList();
+			fail("Exception should be thrown");
+		} catch (Exception ex) {
+			assertThat(ex.getMessage(), CoreMatchers.containsString("Unexpected End of Input"));
+		}
+	}
 }
