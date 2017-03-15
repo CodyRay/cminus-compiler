@@ -84,8 +84,8 @@ public class Checker extends SyntaxTreeVisitor {
         if(node == currentFunctionDeclaration.functionBody) {
             for(ParameterDeclarationNode parameter: currentFunctionDeclaration.functionParameters) {
                 symbolTable.insert(parameter.identifier, parameter.isArray ? 
-                    new ArrayVariableEntry(parameter.identifier, null) : 
-                    new VariableEntry(parameter.identifier));
+                    new ArrayVariableEntry(parameter.getLocation(), parameter.identifier, null) : 
+                    new VariableEntry(parameter.getLocation(), parameter.identifier));
             }
         }
         next.run();
@@ -155,7 +155,7 @@ public class Checker extends SyntaxTreeVisitor {
 
     public void accept(VariableExpressionNode node, Nextable next) throws CompileErrorException {
         next.run();
-        Entry entry = symbolTable.get(node.identifier);
+        Entry entry = symbolTable.get(node.identifier, node.getLocation());
         if(entry.getType() == Entry.Type.Function) {
             throw new CompileErrorException("Cannot use function, '" + entry.identifier +"', as a variable", node.getLocation());
         }
@@ -182,7 +182,7 @@ public class Checker extends SyntaxTreeVisitor {
 
     public void accept(CallExpressionNode node, Nextable next) throws CompileErrorException {
         next.run();
-        Entry entry = symbolTable.get(node.identifier);
+        Entry entry = symbolTable.get(node.identifier, node.getLocation());
 
         if(entry.getType() != Entry.Type.Function) {
             throw new CompileErrorException("Cannot invoke the variable, '" + entry.identifier + "' as a function", node.getLocation());
