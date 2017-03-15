@@ -1,27 +1,25 @@
 package io.github.haroldhues.SyntaxTree;
 
-import java.util.function.Consumer;
-
 import io.github.haroldhues.*;
 import io.github.haroldhues.Tokens.*;
 
 public class ReturnStatementNode extends StatementNode {
     public ExpressionNode expression;
 
-    public static ReturnStatementNode parse(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+    public static ReturnStatementNode parse(Parser parser) throws CompileErrorException {
         parser.parseToken(TokenType.Return);
         ExpressionNode expression = null;
         if(!parser.parseTokenIf(TokenType.Semicolon)) {
-            expression = ExpressionNode.parse(parser, visitor);
+            expression = ExpressionNode.parse(parser);
             parser.parseToken(TokenType.Semicolon);
         }
 
-        ReturnStatementNode statement = new ReturnStatementNode(expression);
-        visitor.accept(statement);
+        ReturnStatementNode statement = new ReturnStatementNode(parser.currentLocation(), expression);
         return statement;
     }
 
-    public ReturnStatementNode(ExpressionNode expressionNode) {
+    public ReturnStatementNode(Location location, ExpressionNode expressionNode) {
+    	super(location);
         this.expression = expressionNode;
     }
 

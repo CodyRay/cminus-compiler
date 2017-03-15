@@ -1,6 +1,7 @@
 package io.github.haroldhues.SyntaxTree;
 
 import io.github.haroldhues.CompileErrorException;
+import io.github.haroldhues.Location;
 import io.github.haroldhues.Tokens.*;
 
 public class BinaryExpressionNode extends ExpressionNode {
@@ -8,7 +9,8 @@ public class BinaryExpressionNode extends ExpressionNode {
     public Token operation;
     public ExpressionNode right;
 
-    public BinaryExpressionNode(ExpressionNode left, Token operation, ExpressionNode right) {
+    public BinaryExpressionNode(Location location, ExpressionNode left, Token operation, ExpressionNode right) {
+    	super(location);
         this.left = left;
         this.operation = operation;
         this.right = right;

@@ -1,7 +1,5 @@
 package io.github.haroldhues.SyntaxTree;
 
-import java.util.function.Consumer;
-
 import io.github.haroldhues.*;
 import io.github.haroldhues.Tokens.*;
 
@@ -17,7 +15,7 @@ public class TypeSpecifierNode extends SyntaxTreeNode {
 
     public Type type;
 
-    public static TypeSpecifierNode parse(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+    public static TypeSpecifierNode parse(Parser parser) throws CompileErrorException {
         Type type;
         if(parser.parseTokenIf(TokenType.Int)) {
             type = Type.Int;
@@ -28,12 +26,12 @@ public class TypeSpecifierNode extends SyntaxTreeNode {
             type = null; // Unreachable
         }
         
-        TypeSpecifierNode node = new TypeSpecifierNode(type);
-        visitor.accept(node);
+        TypeSpecifierNode node = new TypeSpecifierNode(parser.currentLocation(), type);
         return node;
     }
 
-    public TypeSpecifierNode(Type type) {
+    public TypeSpecifierNode(Location location, Type type) {
+    	super(location);
         this.type = type;
     }
 

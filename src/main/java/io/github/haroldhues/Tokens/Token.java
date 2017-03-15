@@ -1,6 +1,10 @@
 package io.github.haroldhues.Tokens;
 
 import java.util.stream.Stream;
+
+import io.github.haroldhues.Location;
+
+
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
@@ -8,8 +12,7 @@ import java.util.stream.Collectors;
 public class Token 
 {
     public TokenType type;
-    private int line;
-    private int column;
+    private Location location;
 
     private static final HashMap<String, TokenType> tokenTypeMap = new HashMap<String, TokenType>();
     private static final HashMap<TokenType, String> lexemeMap = new HashMap<TokenType, String>();
@@ -22,25 +25,19 @@ public class Token
         buildTypeMap();
         this.type = tokenTypeMap.get(text);
     }
-    public Token(TokenType type, int line, int column) {
+    public Token(TokenType type, Location location) {
         this.type = type;
-        this.line = line;
-        this.column = column;
+        this.location = location;
     }
 
-    public Token(String text, int line, int column) {
+    public Token(String text, Location location) {
         buildTypeMap();
         this.type = tokenTypeMap.get(text);
-        this.line = line;
-        this.column = column;
+        this.location = location;
     }
 
-    public int getLine() {
-        return line;
-    }
-
-    public int getColumn() {
-        return column;
+    public Location getLocation() {
+        return location;
     }
 
     public int getLength() {

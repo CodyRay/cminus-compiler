@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.function.Function;
 
 import io.github.haroldhues.CompileErrorException;
-import io.github.haroldhues.SymbolTable;
+import io.github.haroldhues.Location;
 
 
 
@@ -13,7 +13,15 @@ import io.github.haroldhues.SymbolTable;
 
 public abstract class SyntaxTreeNode 
 {
-    public SyntaxTreeNode() { }
+    private Location location = null;
+
+    public SyntaxTreeNode(Location location) {
+        this.location = location;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
 
     public abstract void visit(SyntaxTreeVisitor visitor) throws CompileErrorException;
 

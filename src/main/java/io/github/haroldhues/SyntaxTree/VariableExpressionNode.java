@@ -1,7 +1,5 @@
 package io.github.haroldhues.SyntaxTree;
 
-import java.util.function.Consumer;
-
 import io.github.haroldhues.*;
 import io.github.haroldhues.Tokens.*;
 
@@ -9,30 +7,31 @@ public class VariableExpressionNode extends ExpressionNode {
     public String identifier;
     public ExpressionNode arrayExpression;
     
-    public static VariableExpressionNode parse(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+    public static VariableExpressionNode parse(Parser parser) throws CompileErrorException {
         IdentifierToken idToken = (IdentifierToken)parser.parseToken(TokenType.Identifier);
         String identifier = idToken.identifier;
-        ExpressionNode arrayExpression = parseArrayNotation(parser, visitor);
+        ExpressionNode arrayExpression = parseArrayNotation(parser);
 
-        VariableExpressionNode expression = new VariableExpressionNode(identifier, arrayExpression);
-        visitor.accept(expression);
+        VariableExpressionNode expression = new VariableExpressionNode(parser.currentLocation(), identifier, arrayExpression);
         return expression;
     }
 
-    public VariableExpressionNode(String identifier, ExpressionNode arrayExpression) {
+    public VariableExpressionNode(Location location, String identifier, ExpressionNode arrayExpression) {
+    	super(location);
         this.identifier = identifier;
         this.arrayExpression = arrayExpression;
     }
 
-    public VariableExpressionNode(String identifier) {
+    public VariableExpressionNode(Location location, String identifier) {
+    	super(location);
         this.identifier = identifier;
         this.arrayExpression = null;
     }
 
-    public static ExpressionNode parseArrayNotation(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+    public static ExpressionNode parseArrayNotation(Parser parser) throws CompileErrorException {
         ExpressionNode returnValue = null;
         if(parser.parseTokenIf(TokenType.LeftBracket)) {
-            returnValue = ExpressionNode.parse(parser, visitor);
+            returnValue = ExpressionNode.parse(parser);
             parser.parseToken(TokenType.RightBracket);
         }
         return returnValue;

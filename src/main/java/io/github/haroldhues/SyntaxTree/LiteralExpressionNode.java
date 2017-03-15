@@ -1,22 +1,20 @@
 package io.github.haroldhues.SyntaxTree;
 
-import java.util.function.Consumer;
-
 import io.github.haroldhues.*;
 import io.github.haroldhues.Tokens.*;
 
 public class LiteralExpressionNode extends ExpressionNode {
     public Integer value;
     
-    public static LiteralExpressionNode parse(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+    public static LiteralExpressionNode parse(Parser parser) throws CompileErrorException {
         Token token = parser.parseToken(TokenType.IntegerLiteral);
         Integer value = ((IntegerLiteralToken)token).value;
 
-        LiteralExpressionNode expression = new LiteralExpressionNode(value);
-        visitor.accept(expression);
+        LiteralExpressionNode expression = new LiteralExpressionNode(parser.currentLocation(), value);
         return expression;
     }
-    public LiteralExpressionNode(Integer value) {
+    public LiteralExpressionNode(Location location, Integer value) {
+    	super(location);
         this.value = value;
     }
 

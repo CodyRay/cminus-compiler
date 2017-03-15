@@ -1,8 +1,7 @@
 package io.github.haroldhues.SyntaxTree;
 
-import java.util.function.Consumer;
-
 import io.github.haroldhues.CompileErrorException;
+import io.github.haroldhues.Location;
 import io.github.haroldhues.Parser;
 import io.github.haroldhues.Tokens.IdentifierToken;
 import io.github.haroldhues.Tokens.Token;
@@ -18,8 +17,8 @@ public class ParameterDeclarationNode extends SyntaxTreeNode {
     public String identifier;
     public boolean isArray = false;
 
-    public static ParameterDeclarationNode parse(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
-        TypeSpecifierNode typeSpecifier = TypeSpecifierNode.parse(parser, visitor);
+    public static ParameterDeclarationNode parse(Parser parser) throws CompileErrorException {
+        TypeSpecifierNode typeSpecifier = TypeSpecifierNode.parse(parser);
         String identifier = ((IdentifierToken)parser.parseToken(TokenType.Identifier)).identifier;
         boolean isArray = false;
 
@@ -28,12 +27,12 @@ public class ParameterDeclarationNode extends SyntaxTreeNode {
             parser.parseToken(TokenType.RightBracket);
         }
 
-        ParameterDeclarationNode declaration = new ParameterDeclarationNode(typeSpecifier, identifier, isArray);
-        visitor.accept(declaration);
+        ParameterDeclarationNode declaration = new ParameterDeclarationNode(parser.currentLocation(), typeSpecifier, identifier, isArray);
         return declaration;
     }
 
-    public ParameterDeclarationNode(TypeSpecifierNode typeSpecifier, String identifier, boolean isArray) {
+    public ParameterDeclarationNode(Location location, TypeSpecifierNode typeSpecifier, String identifier, boolean isArray) {
+    	super(location);
         this.typeSpecifier = typeSpecifier;
         this.identifier = identifier;
         this.isArray = isArray;

@@ -2,9 +2,8 @@ package io.github.haroldhues.SyntaxTree;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
-
 import io.github.haroldhues.CompileErrorException;
+import io.github.haroldhues.Location;
 import io.github.haroldhues.Parser;
 import io.github.haroldhues.Tokens.IdentifierToken;
 import io.github.haroldhues.Tokens.IntegerLiteralToken;
@@ -25,8 +24,8 @@ public class DeclarationNode extends SyntaxTreeNode {
     public List<ParameterDeclarationNode> functionParameters = new ArrayList<ParameterDeclarationNode>();
 	public CompoundStatementNode functionBody;
 
-	public static DeclarationNode parse(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
-		TypeSpecifierNode typeSpecifier = TypeSpecifierNode.parse(parser, visitor);
+	public static DeclarationNode parse(Parser parser) throws CompileErrorException {
+		TypeSpecifierNode typeSpecifier = TypeSpecifierNode.parse(parser);
 		String identifier;
 		if (!parser.currentIs(TokenType.Identifier)) {
 			parser.throwExpected(TokenType.Identifier);
@@ -36,39 +35,39 @@ public class DeclarationNode extends SyntaxTreeNode {
 		
 		DeclarationNode declaration;
 		if (parser.parseTokenIf(TokenType.Semicolon)) {
-			declaration = new DeclarationNode(typeSpecifier, identifier);
+			declaration = new DeclarationNode(parser.currentLocation(), typeSpecifier, identifier);
 		} else if (parser.parseTokenIf(TokenType.LeftBracket)) {
 			int arraySize = ((IntegerLiteralToken) parser.parseToken(TokenType.IntegerLiteral)).value;
 			parser.parseToken(TokenType.RightBracket);
 			parser.parseToken(TokenType.Semicolon);
-			declaration = new DeclarationNode(typeSpecifier, identifier, arraySize);
+			declaration = new DeclarationNode(parser.currentLocation(), typeSpecifier, identifier, arraySize);
 		} else if (parser.parseTokenIf(TokenType.LeftParenthesis)) {
-			List<ParameterDeclarationNode> functionParameters = parseFunctionParameters(parser, visitor);
+			List<ParameterDeclarationNode> functionParameters = parseFunctionParameters(parser);
 			parser.parseToken(TokenType.RightParenthesis);
-			CompoundStatementNode functionBody = CompoundStatementNode.parse(parser, visitor);
-			declaration = new DeclarationNode(typeSpecifier, identifier, functionParameters, functionBody);
+			CompoundStatementNode functionBody = CompoundStatementNode.parse(parser);
+			declaration = new DeclarationNode(parser.currentLocation(), typeSpecifier, identifier, functionParameters, functionBody);
 		} else {
 			parser.throwExpected(TokenType.Semicolon, TokenType.LeftBracket, TokenType.LeftParenthesis);
 			declaration = null; // Unreachable Code
 		}
 
-		visitor.accept(declaration);
 		return declaration;
 	}
 
-	public static List<ParameterDeclarationNode> parseFunctionParameters(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+	public static List<ParameterDeclarationNode> parseFunctionParameters(Parser parser) throws CompileErrorException {
 		List<ParameterDeclarationNode> parameters = new ArrayList<ParameterDeclarationNode>();
 		if(!parser.parseTokenIf(TokenType.Void)) {
 			do {
-				parameters.add(ParameterDeclarationNode.parse(parser, visitor));
+				parameters.add(ParameterDeclarationNode.parse(parser));
 			}
 			while(parser.parseTokenIf(TokenType.Comma));
 		}
 		return parameters;
 	}
 
-	public DeclarationNode(TypeSpecifierNode typeSpecifier, String identifier, List<ParameterDeclarationNode> functionParameters,
-			CompoundStatementNode functionBody) {
+	public DeclarationNode(Location location, TypeSpecifierNode typeSpecifier, String identifier,
+			List<ParameterDeclarationNode> functionParameters, CompoundStatementNode functionBody) {
+		super(location);
 		type = Type.Function;
 		this.typeSpecifier = typeSpecifier;
 		this.identifier = identifier;
@@ -76,13 +75,15 @@ public class DeclarationNode extends SyntaxTreeNode {
 		this.functionBody = functionBody;
 	}
 
-	public DeclarationNode(TypeSpecifierNode typeSpecifier, String identifier) {
+	public DeclarationNode(Location location, TypeSpecifierNode typeSpecifier, String identifier) {
+		super(location);
 		type = Type.Variable;
 		this.typeSpecifier = typeSpecifier;
 		this.identifier = identifier;
 	}
 
-	public DeclarationNode(TypeSpecifierNode typeSpecifier, String identifier, int arraySize) {
+	public DeclarationNode(Location location, TypeSpecifierNode typeSpecifier, String identifier, int arraySize) {
+		super(location);
 		type = Type.ArrayVariable;
 		this.typeSpecifier = typeSpecifier;
 		this.identifier = identifier;

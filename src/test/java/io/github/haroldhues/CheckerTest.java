@@ -1,16 +1,9 @@
 package io.github.haroldhues;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import org.junit.Test;
 
 import io.github.haroldhues.SyntaxTree.*;
-import io.github.haroldhues.Tokens.Token;
-import io.github.haroldhues.Tokens.TokenType;
-
 import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
 
 public class CheckerTest {
 	
@@ -19,7 +12,7 @@ public class CheckerTest {
 		StringSource testSource = new StringSource(sampleProgram);
 		Scanner testScanner = new Scanner(testSource);
 		Parser parser = new Parser(testScanner);
-		RootNode ast = parser.parse((e) -> {});
+		RootNode ast = parser.parse();
         Checker checker = new Checker();
         ast.visit(checker);
         assertNotNull(ast.symbolTable);
@@ -30,7 +23,7 @@ public class CheckerTest {
 		StringSource testSource = new StringSource(sampleProgram2);
 		Scanner testScanner = new Scanner(testSource);
 		Parser parser = new Parser(testScanner);
-		RootNode ast = parser.parse((e) -> {});
+		RootNode ast = parser.parse();
         Checker checker = new Checker();
         ast.visit(checker);
         assertNotNull(ast.symbolTable);

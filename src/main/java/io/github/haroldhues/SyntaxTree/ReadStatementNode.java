@@ -1,8 +1,7 @@
 package io.github.haroldhues.SyntaxTree;
 
-import java.util.function.Consumer;
-
 import io.github.haroldhues.CompileErrorException;
+import io.github.haroldhues.Location;
 import io.github.haroldhues.Parser;
 import io.github.haroldhues.Tokens.Token;
 import io.github.haroldhues.Tokens.TokenType;
@@ -10,23 +9,23 @@ import io.github.haroldhues.Tokens.TokenType;
 public class ReadStatementNode extends StatementNode {
     public VariableExpressionNode reference;
     
-    public static ReadStatementNode parse(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+    public static ReadStatementNode parse(Parser parser) throws CompileErrorException {
         parser.parseToken(TokenType.Read);
         VariableExpressionNode reference;
         if(parser.parseTokenIf(TokenType.LeftParenthesis)) {
-            reference = VariableExpressionNode.parse(parser, visitor);
+            reference = VariableExpressionNode.parse(parser);
             parser.parseToken(TokenType.RightParenthesis);
         } else {
-            reference = VariableExpressionNode.parse(parser, visitor);
+            reference = VariableExpressionNode.parse(parser);
         }
         parser.parseToken(TokenType.Semicolon);
 
-        ReadStatementNode statement = new ReadStatementNode(reference);
-        visitor.accept(statement);
+        ReadStatementNode statement = new ReadStatementNode(parser.currentLocation(), reference);
         return statement;
     }
 
-    public ReadStatementNode(VariableExpressionNode reference) {
+    public ReadStatementNode(Location location, VariableExpressionNode reference) {
+    	super(location);
         this.reference = reference;
     }
 

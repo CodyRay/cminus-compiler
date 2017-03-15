@@ -114,26 +114,26 @@ public class Scanner extends Enumerable<Token>
         }
 
         if (currentChar == null && state != State.Initial) {
-            throw new CompileErrorException("Unexpected End of Input", lineNumber, columnNumber); // End
+            throw new CompileErrorException("Unexpected End of Input", new Location(lineNumber, columnNumber)); // End
         } else {
             complete = true;
-            return new Token(TokenType.Eof, lineNumber, columnNumber); // We must be at State.Initial and the end of input
+            return new Token(TokenType.Eof, new Location(lineNumber, columnNumber)); // We must be at State.Initial and the end of input
         }
     }
 
     private static Token identifyToken(State state, String text, int line, int column) {
     	for (Lexeme lex : Lexeme.reservedKeywords) {
     		if (lex.text.equals(text)) {
-    			return new Token(lex.type, line, column);
+    			return new Token(lex.type, new Location(line, column));
     		}
     	}
     	
         return 
             state == State.AcceptIdentifier ?
-                new IdentifierToken(text, line, column) :
+                new IdentifierToken(text, new Location(line, column)) :
             state == State.AcceptLiteral ?
-                new IntegerLiteralToken(Integer.parseInt(text), line, column) :
-            new Token(text, line, column);
+                new IntegerLiteralToken(Integer.parseInt(text), new Location(line, column)) :
+            new Token(text, new Location(line, column));
     }
 
     private State nextState(State state) throws CompileErrorException {
@@ -172,7 +172,7 @@ public class Scanner extends Enumerable<Token>
                 return State.AcceptSymbol;
             case In5:
                 if (!currentIs('=')) {
-                    throw new CompileErrorException("Unexpected character, expected '='", lineNumber, columnNumber);
+                    throw new CompileErrorException("Unexpected character, expected '='", new Location(lineNumber, columnNumber));
                 }
                 return State.In4;
             case In6:

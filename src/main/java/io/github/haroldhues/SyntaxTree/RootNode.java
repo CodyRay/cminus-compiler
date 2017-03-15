@@ -2,8 +2,6 @@ package io.github.haroldhues.SyntaxTree;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
-
 import io.github.haroldhues.*;
 import io.github.haroldhues.Tokens.*;
 
@@ -14,18 +12,18 @@ public class RootNode extends SyntaxTreeNode {
     // Children
     public List<DeclarationNode> declarationList = new ArrayList<DeclarationNode>();
     
-    public static RootNode parse(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+    public static RootNode parse(Parser parser) throws CompileErrorException {
         List<DeclarationNode> declarationList = new ArrayList<DeclarationNode>();
         while(!parser.parseTokenIf(TokenType.Eof)) {
-            declarationList.add(DeclarationNode.parse(parser, visitor));
+            declarationList.add(DeclarationNode.parse(parser));
         }
 
-        RootNode root = new RootNode(declarationList);
-        visitor.accept(root);
+        RootNode root = new RootNode(parser.currentLocation(), declarationList);
         return root;
     }
 
-    public RootNode(List<DeclarationNode> declarationList) {
+    public RootNode(Location location, List<DeclarationNode> declarationList) {
+    	super(location);
         this.declarationList = declarationList;
     }
 

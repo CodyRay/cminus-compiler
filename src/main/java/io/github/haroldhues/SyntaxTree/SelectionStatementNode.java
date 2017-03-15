@@ -1,8 +1,7 @@
 package io.github.haroldhues.SyntaxTree;
 
-import java.util.function.Consumer;
-
 import io.github.haroldhues.CompileErrorException;
+import io.github.haroldhues.Location;
 import io.github.haroldhues.Parser;
 import io.github.haroldhues.Tokens.Token;
 import io.github.haroldhues.Tokens.TokenType;
@@ -16,24 +15,24 @@ public class SelectionStatementNode extends StatementNode {
     public StatementNode ifBlock;
     public StatementNode elseBlock;
 
-    public static SelectionStatementNode parse(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+    public static SelectionStatementNode parse(Parser parser) throws CompileErrorException {
         parser.parseToken(TokenType.If);
         parser.parseToken(TokenType.LeftParenthesis);
-        ExpressionNode condition = ExpressionNode.parse(parser, visitor);
+        ExpressionNode condition = ExpressionNode.parse(parser);
         parser.parseToken(TokenType.RightParenthesis);
-        StatementNode ifBlock = StatementNode.parse(parser, visitor);
+        StatementNode ifBlock = StatementNode.parse(parser);
         
         StatementNode elseBlock = null;
         if(parser.parseTokenIf(TokenType.Else)) {
-            elseBlock = StatementNode.parse(parser, visitor);
+            elseBlock = StatementNode.parse(parser);
         }
 
-        SelectionStatementNode statement = new SelectionStatementNode(condition, ifBlock, elseBlock);
-        visitor.accept(statement);
+        SelectionStatementNode statement = new SelectionStatementNode(parser.currentLocation(), condition, ifBlock, elseBlock);
         return statement;
     }
 
-    public SelectionStatementNode(ExpressionNode condition, StatementNode ifBlock, StatementNode elseBlock) {
+    public SelectionStatementNode(Location location, ExpressionNode condition, StatementNode ifBlock, StatementNode elseBlock) {
+    	super(location);
         this.condition = condition;
         this.ifBlock = ifBlock;
         this.elseBlock = elseBlock;

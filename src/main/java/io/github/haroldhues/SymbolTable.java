@@ -1,11 +1,8 @@
 package io.github.haroldhues;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import io.github.haroldhues.SyntaxTree.*;
 
 public class SymbolTable {
     private SymbolTable outerScope;

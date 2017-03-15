@@ -1,8 +1,7 @@
 package io.github.haroldhues.SyntaxTree;
 
-import java.util.function.Consumer;
-
 import io.github.haroldhues.CompileErrorException;
+import io.github.haroldhues.Location;
 import io.github.haroldhues.Parser;
 import io.github.haroldhues.Tokens.Token;
 import io.github.haroldhues.Tokens.TokenType;
@@ -10,17 +9,17 @@ import io.github.haroldhues.Tokens.TokenType;
 
 public class WriteStatementNode extends StatementNode {
     public ExpressionNode expression;
-    public static WriteStatementNode parse(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+    public static WriteStatementNode parse(Parser parser) throws CompileErrorException {
         parser.parseToken(TokenType.Write);
-        ExpressionNode expression = ExpressionNode.parse(parser, visitor);
+        ExpressionNode expression = ExpressionNode.parse(parser);
         parser.parseToken(TokenType.Semicolon);
 
-        WriteStatementNode statement = new WriteStatementNode(expression);
-        visitor.accept(statement);
+        WriteStatementNode statement = new WriteStatementNode(parser.currentLocation(), expression);
         return statement;
     }
 
-    public WriteStatementNode(ExpressionNode expression) {
+    public WriteStatementNode(Location location, ExpressionNode expression) {
+    	super(location);
         this.expression = expression;
     }
 

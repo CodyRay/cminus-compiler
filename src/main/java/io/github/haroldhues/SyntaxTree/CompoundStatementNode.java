@@ -1,9 +1,8 @@
 package io.github.haroldhues.SyntaxTree;
 
 import java.util.List;
-import java.util.function.Consumer;
-
 import io.github.haroldhues.CompileErrorException;
+import io.github.haroldhues.Location;
 import io.github.haroldhues.Parser;
 import io.github.haroldhues.SymbolTable;
 import io.github.haroldhues.Tokens.Token;
@@ -23,7 +22,7 @@ public class CompoundStatementNode extends StatementNode {
     public List<DeclarationNode> localDeclarations = new ArrayList<DeclarationNode>();
     public List<StatementNode> statements = new ArrayList<StatementNode>();
 
-    public static CompoundStatementNode parse(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+    public static CompoundStatementNode parse(Parser parser) throws CompileErrorException {
         List<DeclarationNode> localDeclarations = new ArrayList<DeclarationNode>();
         List<StatementNode> statements = new ArrayList<StatementNode>();
         parser.parseToken(TokenType.LeftBrace);
@@ -32,24 +31,24 @@ public class CompoundStatementNode extends StatementNode {
             Token start = parser.currentToken();
             // This will allow function declarations inside functions
             // but we will check for this and cause errors for that.
-            DeclarationNode declaration = DeclarationNode.parse(parser, visitor);
+            DeclarationNode declaration = DeclarationNode.parse(parser);
             if(declaration.type == DeclarationNode.Type.Function) {
-                throw new CompileErrorException("Functions cannot be declared inside of functions", start.getLine(), start.getColumn());
+                throw new CompileErrorException("Functions cannot be declared inside of functions", start.getLocation());
             }
 
             localDeclarations.add(declaration);
         }
         // Statements
         while(!parser.parseTokenIf(TokenType.RightBrace)) {
-            statements.add(StatementNode.parse(parser, visitor));
+            statements.add(StatementNode.parse(parser));
         }
         
-        CompoundStatementNode statement = new CompoundStatementNode(localDeclarations, statements);
-        visitor.accept(statement);
+        CompoundStatementNode statement = new CompoundStatementNode(parser.currentLocation(), localDeclarations, statements);
         return statement;
     }
 
-    public CompoundStatementNode(List<DeclarationNode> localDeclarations, List<StatementNode> statements) {
+    public CompoundStatementNode(Location location, List<DeclarationNode> localDeclarations, List<StatementNode> statements) {
+    	super(location);
         this.localDeclarations = localDeclarations;
         this.statements = statements;
     }

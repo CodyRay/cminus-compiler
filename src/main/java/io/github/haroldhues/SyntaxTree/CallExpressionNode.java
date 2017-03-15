@@ -1,8 +1,6 @@
 package io.github.haroldhues.SyntaxTree;
 
 import java.util.List;
-import java.util.function.Consumer;
-
 import io.github.haroldhues.*;
 import io.github.haroldhues.Tokens.*;
 
@@ -16,26 +14,26 @@ public class CallExpressionNode extends ExpressionNode {
     public String identifier;
     public List<ExpressionNode> arguments;
 
-    public static CallExpressionNode parse(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+    public static CallExpressionNode parse(Parser parser) throws CompileErrorException {
         String identifier = ((IdentifierToken)parser.parseToken(TokenType.Identifier)).identifier;
-        List<ExpressionNode> arguments = parseCallArgs(parser, visitor);
+        List<ExpressionNode> arguments = parseCallArgs(parser);
         
-        CallExpressionNode expression = new CallExpressionNode(identifier, arguments);
-        visitor.accept(expression);
+        CallExpressionNode expression = new CallExpressionNode(parser.currentLocation(), identifier, arguments);
         return expression;
     }
 
-    public CallExpressionNode(String identifier, List<ExpressionNode> arguments) {
+    public CallExpressionNode(Location location, String identifier, List<ExpressionNode> arguments) {
+    	super(location);
         this.identifier = identifier;
         this.arguments = arguments;
     }
 
-    public static List<ExpressionNode> parseCallArgs(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+    public static List<ExpressionNode> parseCallArgs(Parser parser) throws CompileErrorException {
         List<ExpressionNode> args = new ArrayList<ExpressionNode>();
         parser.parseToken(TokenType.LeftParenthesis);
         if(!parser.parseTokenIf(TokenType.RightParenthesis)) {
             do {
-                args.add(ExpressionNode.parse(parser, visitor));
+                args.add(ExpressionNode.parse(parser));
             } while(parser.parseTokenIf(TokenType.Comma));
             parser.parseToken(TokenType.RightParenthesis);
         }

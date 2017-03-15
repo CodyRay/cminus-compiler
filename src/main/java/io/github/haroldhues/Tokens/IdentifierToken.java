@@ -1,5 +1,9 @@
 package io.github.haroldhues.Tokens;
 
+import io.github.haroldhues.Location;
+
+
+
 public class IdentifierToken extends Token
 {
     public String identifier;
@@ -9,8 +13,8 @@ public class IdentifierToken extends Token
         this.identifier = identifier;
     }
     
-    public IdentifierToken(String identifier, int line, int column) {
-        super(TokenType.Identifier, line, column);
+    public IdentifierToken(String identifier, Location location) {
+        super(TokenType.Identifier, location);
         this.identifier = identifier;
     }
 

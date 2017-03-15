@@ -1,10 +1,7 @@
 package io.github.haroldhues.SyntaxTree;
 
-import java.util.function.Consumer;
-
 import io.github.haroldhues.CompileErrorException;
-
-
+import io.github.haroldhues.Location;
 import io.github.haroldhues.Parser;
 import io.github.haroldhues.Tokens.IdentifierToken;
 import io.github.haroldhues.Tokens.Token;
@@ -25,70 +22,70 @@ public abstract class ExpressionNode extends SyntaxTreeNode {
         IntegerArray,
         Void
     }
+    
+    protected ExpressionNode(Location location) {
+    	super(location);
+    }
 
-    public static ExpressionNode parse(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+    public static ExpressionNode parse(Parser parser) throws CompileErrorException {
         // There is some ambiguity between `var = expression` and `simple-expression`
         // which also can be just `var`. To resolve this we assume that it is a simple
         // expression until we see the assignment operator
-        ExpressionNode expression = parseComparableExpressionNode(parser, visitor);
+        ExpressionNode expression = parseComparableExpressionNode(parser);
         if(parser.parseTokenIf(TokenType.Assign)) {
             if(expression.expressionType() != Type.Variable) {
-                throw new CompileErrorException("The left hand of an assignment must be a variable reference", parser.currentToken().getLine(), parser.currentToken().getColumn());
+                throw new CompileErrorException("The left hand of an assignment must be a variable reference", parser.currentToken().getLocation());
             }
             VariableExpressionNode variable = (VariableExpressionNode)expression;
-            expression = ExpressionNode.parse(parser, visitor);
-            expression = new AssignmentExpressionNode(variable, expression);
-            visitor.accept(expression); // Since it was manually created
+            expression = ExpressionNode.parse(parser);
+            expression = new AssignmentExpressionNode(parser.currentLocation(), variable, expression);
         }
         return expression;
     }
      
-    public static ExpressionNode parseComparableExpressionNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
-        ExpressionNode expression = parseAdditiveNode(parser, visitor);
+    public static ExpressionNode parseComparableExpressionNode(Parser parser) throws CompileErrorException {
+        ExpressionNode expression = parseAdditiveNode(parser);
         if(parser.currentToken().isCompareOperator()) {
             Token compare = parser.currentToken();
             // Already been looked at for the comparison
             parser.moveNextToken();
-            ExpressionNode rightExpression = parseAdditiveNode(parser, visitor);
-            expression = new BinaryExpressionNode(expression, compare, rightExpression);
-            visitor.accept(expression); // Manually visit since it was manually created
+            ExpressionNode rightExpression = parseAdditiveNode(parser);
+            expression = new BinaryExpressionNode(parser.currentLocation(), expression, compare, rightExpression);
         }
         return expression;
     }
 
-    public static ExpressionNode parseAdditiveNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
-        ExpressionNode expression = parseTermNode(parser, visitor);
+    public static ExpressionNode parseAdditiveNode(Parser parser) throws CompileErrorException {
+        ExpressionNode expression = parseTermNode(parser);
         while(parser.currentToken().isAddOrSubtractOperator()) {
             Token operation = parser.currentToken();
             parser.moveNextToken();
-            ExpressionNode term = parseTermNode(parser, visitor);
+            ExpressionNode term = parseTermNode(parser);
             // move what we have already parsed deeper in the tree so we
             // get left associativity           
-            expression = new BinaryExpressionNode(expression, operation, term);
-            visitor.accept(expression); // Manually visit since it was manually created
+            expression = new BinaryExpressionNode(parser.currentLocation(), expression, operation, term);
         }
         return expression;
     }
     
-    public static ExpressionNode parseTermNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
-        ExpressionNode expression = parseFactorNode(parser, visitor); // Singleton
+    public static ExpressionNode parseTermNode(Parser parser) throws CompileErrorException {
+        ExpressionNode expression = parseFactorNode(parser); // Singleton
         while(parser.currentToken().isMultiplyOrDivideOperator()) {
             Token operation = parser.currentToken();
             parser.moveNextToken();
-            ExpressionNode factor = parseFactorNode(parser, visitor);
+            ExpressionNode factor = parseFactorNode(parser);
             // move what we have already parsed deeper in the tree so we
             // get left associativity           
-            expression = new BinaryExpressionNode(expression, operation, factor);
-            visitor.accept(expression); // Manually do this accept since we manually created the node here
+            expression = new BinaryExpressionNode(parser.currentLocation(), expression, operation, factor);
         }
         return expression;
     }
 
-    public static ExpressionNode parseFactorNode(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
+    public static ExpressionNode parseFactorNode(Parser parser) throws CompileErrorException {
         if(parser.currentIs(TokenType.IntegerLiteral)) {
-            return LiteralExpressionNode.parse(parser, visitor);
+            return LiteralExpressionNode.parse(parser);
         } else if (parser.parseTokenIf(TokenType.LeftParenthesis)) {
-            ExpressionNode expression = new NestedExpressionNode(ExpressionNode.parse(parser, visitor));
+            ExpressionNode expression = new NestedExpressionNode(parser.currentLocation(), ExpressionNode.parse(parser));
             parser.parseToken(TokenType.RightParenthesis);
             return expression;
         } else if (parser.currentIs(TokenType.Identifier)) {
@@ -97,12 +94,10 @@ public abstract class ExpressionNode extends SyntaxTreeNode {
             // This one is a bit weird because identifier is the start of both a
             // variable nod and a callnode, so we have to parse ahead a bit here
             if(parser.currentIs(TokenType.LeftParenthesis)) {
-                CallExpressionNode call = new CallExpressionNode(identifier, CallExpressionNode.parseCallArgs(parser, visitor));
-                visitor.accept(call); // Manually accept because we manually created
+                CallExpressionNode call = new CallExpressionNode(parser.currentLocation(), identifier, CallExpressionNode.parseCallArgs(parser));
                 return call;
             } else {
-                VariableExpressionNode variable = new VariableExpressionNode(identifier, VariableExpressionNode.parseArrayNotation(parser, visitor));
-                visitor.accept(variable); // Manually accept because we manually created
+                VariableExpressionNode variable = new VariableExpressionNode(parser.currentLocation(), identifier, VariableExpressionNode.parseArrayNotation(parser));
                 return variable;
             }
         } else {

@@ -1,7 +1,5 @@
 package io.github.haroldhues;
 
-import java.util.function.Consumer;
-
 import io.github.haroldhues.SyntaxTree.*;
 import io.github.haroldhues.Tokens.*;
 
@@ -21,6 +19,10 @@ public class Parser {
             throw new CompileErrorException("Unexpected end of file");
         }
         return currentItem;
+    }
+
+    public Location currentLocation() throws CompileErrorException {
+        return currentToken().getLocation();
     }
 
     public boolean currentIs(TokenType type) throws CompileErrorException {
@@ -75,10 +77,10 @@ public class Parser {
         builder.append(" but instead found ");
         builder.append(currentToken().toString().trim());
 
-        throw new CompileErrorException(builder.toString(), currentToken().getLine(), currentToken().getColumn());
+        throw new CompileErrorException(builder.toString(), currentToken().getLocation());
     }
 
-    public RootNode parse(Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
-        return RootNode.parse(this, visitor);
+    public RootNode parse() throws CompileErrorException {
+        return RootNode.parse(this);
     }
 }

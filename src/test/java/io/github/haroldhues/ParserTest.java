@@ -17,16 +17,16 @@ public class ParserTest {
 	public void testBasicProgram() throws CompileErrorException {
 		StringSource testSource = new StringSource("void main( void ) { }");
 
-		RootNode expected = new RootNode(new ArrayList<DeclarationNode>(
-			Arrays.asList(new DeclarationNode(new TypeSpecifierNode(TypeSpecifierNode.Type.Void), "main", new ArrayList<ParameterDeclarationNode>(), new CompoundStatementNode(
-				new ArrayList<DeclarationNode>(), 
-				new ArrayList<StatementNode>()
+		RootNode expected = new RootNode(Location.None, new ArrayList<DeclarationNode>(
+			Arrays.asList(new DeclarationNode(Location.None, new TypeSpecifierNode(Location.None, TypeSpecifierNode.Type.Void), "main", new ArrayList<ParameterDeclarationNode>(), new CompoundStatementNode(
+				Location.None, 
+				new ArrayList<DeclarationNode>(), new ArrayList<StatementNode>()
 			)))
 		));
 		
 		Scanner testScanner = new Scanner(testSource);
 		Parser parser = new Parser(testScanner);
-		RootNode ast = parser.parse((e) -> {});
+		RootNode ast = parser.parse();
 
 		assertThat(ast, is(expected));
 	}
@@ -36,15 +36,15 @@ public class ParserTest {
 		StringSource testSource = new StringSource("( array[1] + fun(1, x, y) )");
 		Scanner testScanner = new Scanner(testSource);
 		Parser parser = new Parser(testScanner);
-		ExpressionNode factor = ExpressionNode.parseFactorNode(parser, (e) -> {});
+		ExpressionNode factor = ExpressionNode.parseFactorNode(parser);
 		
-		ExpressionNode expectedFactor = new NestedExpressionNode(new BinaryExpressionNode(
-			new VariableExpressionNode("array", new LiteralExpressionNode(1)), 
-			new Token(TokenType.Add), 
-			new CallExpressionNode("fun", new ArrayList<ExpressionNode>(Arrays.asList(
-				new LiteralExpressionNode(1),
-				new VariableExpressionNode("x"),
-				new VariableExpressionNode("y")
+		ExpressionNode expectedFactor = new NestedExpressionNode(Location.None, new BinaryExpressionNode(
+			Location.None, 
+			new VariableExpressionNode(Location.None, "array", new LiteralExpressionNode(Location.None, 1)), 
+			new Token(TokenType.Add), new CallExpressionNode(Location.None, "fun", new ArrayList<ExpressionNode>(Arrays.asList(
+				new LiteralExpressionNode(Location.None, 1),
+				new VariableExpressionNode(Location.None, "x"),
+				new VariableExpressionNode(Location.None, "y")
 			)))
 		));
 		
@@ -56,12 +56,12 @@ public class ParserTest {
 		StringSource testSource = new StringSource(sampleProgram);
 		Scanner testScanner = new Scanner(testSource);
 		Parser parser = new Parser(testScanner);
-		RootNode ast = parser.parse((e) -> {});
+		RootNode ast = parser.parse();
 		String text = ast.toString();
 		StringSource testSource2 = new StringSource(text);
 		Scanner testScanner2 = new Scanner(testSource2);
 		Parser parser2 = new Parser(testScanner2);
-		RootNode ast2 = parser2.parse((e) -> {});
+		RootNode ast2 = parser2.parse();
 		assertThat(ast, is(ast2));
 	}
 	
@@ -70,46 +70,46 @@ public class ParserTest {
 		StringSource testSource = new StringSource(sampleProgram2);
 		Scanner testScanner = new Scanner(testSource);
 		Parser parser = new Parser(testScanner);
-		RootNode ast = parser.parse((e) -> {});
+		RootNode ast = parser.parse();
 		String text = ast.toString();
 		StringSource testSource2 = new StringSource(text);
 		Scanner testScanner2 = new Scanner(testSource2);
 		Parser parser2 = new Parser(testScanner2);
-		RootNode ast2 = parser2.parse((e) -> {});
+		RootNode ast2 = parser2.parse();
 		assertThat(ast, is(ast2));
 	}
 	
 	@Test
 	public void testEquality() throws CompileErrorException {
-		TypeSpecifierNode type1 = new TypeSpecifierNode(TypeSpecifierNode.Type.Void);
+		TypeSpecifierNode type1 = new TypeSpecifierNode(Location.None, TypeSpecifierNode.Type.Void);
 
-		TypeSpecifierNode type2 = new TypeSpecifierNode(TypeSpecifierNode.Type.Void);
+		TypeSpecifierNode type2 = new TypeSpecifierNode(Location.None, TypeSpecifierNode.Type.Void);
 
 		assertThat(type1, is(type2));
 			
-		DeclarationNode declaration1 = new DeclarationNode(new TypeSpecifierNode(TypeSpecifierNode.Type.Void), "main", new ArrayList<ParameterDeclarationNode>(), new CompoundStatementNode(
-			new ArrayList<DeclarationNode>(), 
-			new ArrayList<StatementNode>()
+		DeclarationNode declaration1 = new DeclarationNode(Location.None, new TypeSpecifierNode(Location.None, TypeSpecifierNode.Type.Void), "main", new ArrayList<ParameterDeclarationNode>(), new CompoundStatementNode(
+			Location.None, 
+			new ArrayList<DeclarationNode>(), new ArrayList<StatementNode>()
 		));
 
-		DeclarationNode declaration2 = new DeclarationNode(new TypeSpecifierNode(TypeSpecifierNode.Type.Void), "main", new ArrayList<ParameterDeclarationNode>(), new CompoundStatementNode(
-				new ArrayList<DeclarationNode>(), 
-				new ArrayList<StatementNode>()
+		DeclarationNode declaration2 = new DeclarationNode(Location.None, new TypeSpecifierNode(Location.None, TypeSpecifierNode.Type.Void), "main", new ArrayList<ParameterDeclarationNode>(), new CompoundStatementNode(
+				Location.None, 
+				new ArrayList<DeclarationNode>(), new ArrayList<StatementNode>()
 			));
 
 		assertThat(declaration1, is(declaration2));
 		
-		RootNode expected1 = new RootNode(new ArrayList<DeclarationNode>(
-			Arrays.asList(new DeclarationNode(new TypeSpecifierNode(TypeSpecifierNode.Type.Void), "main", new ArrayList<ParameterDeclarationNode>(), new CompoundStatementNode(
-				new ArrayList<DeclarationNode>(), 
-				new ArrayList<StatementNode>()
+		RootNode expected1 = new RootNode(Location.None, new ArrayList<DeclarationNode>(
+			Arrays.asList(new DeclarationNode(Location.None, new TypeSpecifierNode(Location.None, TypeSpecifierNode.Type.Void), "main", new ArrayList<ParameterDeclarationNode>(), new CompoundStatementNode(
+				Location.None, 
+				new ArrayList<DeclarationNode>(), new ArrayList<StatementNode>()
 			)))
 		));
 
-		RootNode expected2 = new RootNode(new ArrayList<DeclarationNode>(
-			Arrays.asList(new DeclarationNode(new TypeSpecifierNode(TypeSpecifierNode.Type.Void), "main", new ArrayList<ParameterDeclarationNode>(), new CompoundStatementNode(
-				new ArrayList<DeclarationNode>(), 
-				new ArrayList<StatementNode>()
+		RootNode expected2 = new RootNode(Location.None, new ArrayList<DeclarationNode>(
+			Arrays.asList(new DeclarationNode(Location.None, new TypeSpecifierNode(Location.None, TypeSpecifierNode.Type.Void), "main", new ArrayList<ParameterDeclarationNode>(), new CompoundStatementNode(
+				Location.None, 
+				new ArrayList<DeclarationNode>(), new ArrayList<StatementNode>()
 			)))
 		));
 
@@ -122,15 +122,15 @@ public class ParserTest {
 		Scanner testScanner = new Scanner(testSource);
 		Parser parser = new Parser(testScanner);
 		
-		ExpressionNode node = ExpressionNode.parse(parser, (n) -> {});
+		ExpressionNode node = ExpressionNode.parse(parser);
 		
-		ExpressionNode expected = new CallExpressionNode("myFunction", new ArrayList<ExpressionNode>(Arrays.asList(
-			new VariableExpressionNode("expr"),
-			new LiteralExpressionNode(1),
-			new LiteralExpressionNode(2),
-			new CallExpressionNode("nestedCall", new ArrayList<ExpressionNode>()),
-			new NestedExpressionNode(new BinaryExpressionNode(new LiteralExpressionNode(1), new Token(TokenType.Add), new LiteralExpressionNode(2))),
-			new BinaryExpressionNode(new LiteralExpressionNode(5), new Token(TokenType.Add), new LiteralExpressionNode(2))
+		ExpressionNode expected = new CallExpressionNode(Location.None, "myFunction", new ArrayList<ExpressionNode>(Arrays.asList(
+			new VariableExpressionNode(Location.None, "expr"),
+			new LiteralExpressionNode(Location.None, 1),
+			new LiteralExpressionNode(Location.None, 2),
+			new CallExpressionNode(Location.None, "nestedCall", new ArrayList<ExpressionNode>()),
+			new NestedExpressionNode(Location.None, new BinaryExpressionNode(Location.None, new LiteralExpressionNode(Location.None, 1), new Token(TokenType.Add), new LiteralExpressionNode(Location.None, 2))),
+			new BinaryExpressionNode(Location.None, new LiteralExpressionNode(Location.None, 5), new Token(TokenType.Add), new LiteralExpressionNode(Location.None, 2))
 		)));
 		
 		assertThat(node, is(expected));

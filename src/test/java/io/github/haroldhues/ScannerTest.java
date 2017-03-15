@@ -96,8 +96,8 @@ public class ScannerTest {
 		Scanner testScanner = new Scanner(testSource);
 		List<Token> result = testScanner.toList();
 		Token brace = result.get(result.size() - 2);
-		assertThat(brace.getLine(), is(5));
-		assertThat(brace.getColumn(), is(6));
+		assertThat(brace.getLocation().getLine(), is(5));
+		assertThat(brace.getLocation().getColumn(), is(6));
 	}
 
 	@Test

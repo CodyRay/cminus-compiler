@@ -1,5 +1,9 @@
 package io.github.haroldhues.Tokens;
 
+import io.github.haroldhues.Location;
+
+
+
 public class IntegerLiteralToken extends Token
 {
     public Integer value;
@@ -9,8 +13,8 @@ public class IntegerLiteralToken extends Token
         this.value = value;
     }
 
-    public IntegerLiteralToken(Integer value, int line, int column) {
-        super(TokenType.IntegerLiteral, line, column);
+    public IntegerLiteralToken(Integer value, Location location) {
+        super(TokenType.IntegerLiteral, location);
         this.value = value;
     }
 

@@ -1,9 +1,5 @@
 package io.github.haroldhues.SyntaxTree;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.function.Function;
-
 import io.github.haroldhues.CompileErrorException;
 
 

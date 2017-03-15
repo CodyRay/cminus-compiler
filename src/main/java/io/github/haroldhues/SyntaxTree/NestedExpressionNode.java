@@ -1,12 +1,14 @@
 package io.github.haroldhues.SyntaxTree;
 
 import io.github.haroldhues.CompileErrorException;
+import io.github.haroldhues.Location;
 import io.github.haroldhues.Tokens.*;
 
 public class NestedExpressionNode extends ExpressionNode {
     public ExpressionNode expression;
 
-    public NestedExpressionNode(ExpressionNode expression) {
+    public NestedExpressionNode(Location location, ExpressionNode expression) {
+    	super(location);
         this.expression = expression;
     }
 
