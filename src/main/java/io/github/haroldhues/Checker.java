@@ -15,8 +15,17 @@ import io.github.haroldhues.SyntaxTree.*;
 import io.github.haroldhues.SyntaxTree.ExpressionNode.ResultType;
 
 public class Checker extends SyntaxTreeVisitor {
-    private SymbolTable symbolTable = SymbolTable.root();
+    private RootNode rootNode;
+    private SymbolTable symbolTable = SymbolTable.newGlobal();
     private DeclarationNode currentFunctionDeclaration = null;
+
+    public Checker(RootNode rootNode) {
+        this.rootNode = rootNode;
+    }
+
+    public void check() throws CompileErrorException {
+        rootNode.visit(this);
+    }
 
     public void accept(RootNode node, Nextable next) throws CompileErrorException {
         // Create the 'global' scope
@@ -27,7 +36,7 @@ public class Checker extends SyntaxTreeVisitor {
         if (last == null ||
             last.type != DeclarationNode.Type.Function || 
             last.typeSpecifier.type != TypeSpecifierNode.Type.Void ||
-            last.identifier != "main" ||
+            !last.identifier.equals("main") ||
             last.functionParameters.size() != 0) {
 
             throw new CompileErrorException("The last declaration in a program must be a function declaration of the form `void main(void)`");
@@ -151,6 +160,7 @@ public class Checker extends SyntaxTreeVisitor {
         if(node.variable.resultType != ExpressionNode.ResultType.Integer) {
             throw new CompileErrorException("Only simple variables or subscripted arrays variables can be the left hand of an expression", node.variable.getLocation());
         }
+        node.resultType = ExpressionNode.ResultType.Integer;
     }
 
     public void accept(VariableExpressionNode node, Nextable next) throws CompileErrorException {
@@ -165,7 +175,7 @@ public class Checker extends SyntaxTreeVisitor {
 
             if(node.arrayExpression != null && node.arrayExpression.resultType != ResultType.Integer) {
                 // Verify the expression for index results in an integer
-                throw new CompileErrorException("Array variables can only be indexed using integers", node.arrayExpression.getLocation());
+                throw new CompileErrorException("Array notation (i.e., d[x]) can only be used for array variables", node.arrayExpression.getLocation());
             }
         } else {
             node.resultType = ResultType.Integer;
@@ -217,8 +227,9 @@ public class Checker extends SyntaxTreeVisitor {
 
     public void accept(BinaryExpressionNode node, Nextable next) throws CompileErrorException {
         next.run();
-        if(node.left.resultType != ExpressionNode.ResultType.Integer || node.right.resultType != ExpressionNode.ResultType.Integer) {
+        if(node.left.resultType != ResultType.Integer || node.right.resultType != ResultType.Integer) {
             throw new CompileErrorException("Both sides of an " + node.operation.type.toString().toLowerCase() + " expression must result in integers", node.getLocation());
         }
+        node.resultType = ResultType.Integer;
     }
 }

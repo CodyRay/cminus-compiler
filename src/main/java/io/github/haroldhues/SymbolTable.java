@@ -1,5 +1,6 @@
 package io.github.haroldhues;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,19 +14,38 @@ public class SymbolTable {
 
     private SymbolTable() {}
 
+    protected void recordSymbol(Entry entry) {
+        getOuterScope().recordSymbol(entry);
+    }
+
+    public int getLevel() {
+        return outerScope.getLevel() + 1;
+    }
+
+    public String getUniqueName() {
+        return outerScope.getUniqueName();
+    }
+
     public SymbolTable getOuterScope() {
         return outerScope;
     }
 
-    public static SymbolTable root() {
-        return new RootSymbolTable();
+    public String getRecordedSymbols() {
+        return outerScope.getRecordedSymbols();
+    }
+
+    public static SymbolTable newGlobal() {
+        return new GlobalSymbolTable();
     }
 
     public void insert(String identifier, Entry entry) throws CompileErrorException {
         if(lookup.containsKey(identifier)) {
             throw new CompileErrorException("'" + identifier + "' has already been declared in this scope", entry.getLocation());
         }
+        entry.setRename(getUniqueName());
+        entry.setLevel(getLevel());
         lookup.put(identifier, entry);
+        recordSymbol(entry);
     }
 
 
@@ -69,8 +89,18 @@ public class SymbolTable {
             return location;
         }
 
+        public void setRename(String rename) {
+            this.rename = rename;
+        }
+
+        public void setLevel(Integer level) {
+            this.level = level;
+        }
+
         public String identifier;
         private Location location;
+        public String rename;
+        public Integer level;
 
         public abstract Type getType();
     }
@@ -100,6 +130,14 @@ public class SymbolTable {
             builder.append("{ ");
             builder.append("identifier: ");
             builder.append(identifier);
+            builder.append(", type: ");
+            builder.append(getType());
+            builder.append(", location: ");
+            builder.append(getLocation());
+            builder.append(", level: ");
+            builder.append(level);
+            builder.append(", rename: ");
+            builder.append(rename);
             builder.append(", returnType: ");
             builder.append(returnType);
             builder.append(", parameters: ");
@@ -145,6 +183,14 @@ public class SymbolTable {
             builder.append("{ ");
             builder.append("identifier: ");
             builder.append(identifier);
+            builder.append(", type: ");
+            builder.append(getType());
+            builder.append(", location: ");
+            builder.append(getLocation());
+            builder.append(", level: ");
+            builder.append(level);
+            builder.append(", rename: ");
+            builder.append(rename);
             builder.append(" }");
             return builder.toString();
         }
@@ -168,6 +214,14 @@ public class SymbolTable {
             builder.append("{ ");
             builder.append("identifier: ");
             builder.append(identifier);
+            builder.append(", type: ");
+            builder.append(getType());
+            builder.append(", location: ");
+            builder.append(getLocation());
+            builder.append(", level: ");
+            builder.append(level);
+            builder.append(", rename: ");
+            builder.append(rename);
             builder.append(", size: ");
             builder.append(size);
             builder.append(" }");
@@ -176,13 +230,48 @@ public class SymbolTable {
     }
 
 
-    private static class RootSymbolTable extends SymbolTable {
+    private static class GlobalSymbolTable extends SymbolTable {
+        private int counter = 0;
+        private List<Entry> recorded = new ArrayList<Entry>();
+
+        public int getLevel() {
+            return -1;
+        }
+
+        public String getUniqueName() {
+            counter++;
+            return getFancyString(counter);
+        }
+
+        // http://codereview.stackexchange.com/a/44549
+        private static String getFancyString(int number) {
+            StringBuilder builder = new StringBuilder();
+            while (number-- > 0) {
+                builder.append((char)('a' + (number % 26)));
+                number /= 26;
+            }
+            return builder.reverse().toString();
+        }
+
         public void insert(String identifier, Entry entry) throws CompileErrorException {
-            throw new UnsupportedOperationException("Cannot insert into root symbol table");
+            throw new UnsupportedOperationException("Cannot insert into global symbol table");
         }
 
         public Entry get(String identifier, Location location) throws CompileErrorException {
             throw new CompileErrorException("'" + identifier + "' has not been defined", location);
+        }
+
+        protected void recordSymbol(Entry entry) {
+            recorded.add(entry);
+        }
+
+        public String getRecordedSymbols() {
+            StringBuilder builder = new StringBuilder();
+            for(Entry record: recorded) {
+                builder.append(record);
+                builder.append('\n');
+            }
+            return builder.toString();
         }
     }
 }
