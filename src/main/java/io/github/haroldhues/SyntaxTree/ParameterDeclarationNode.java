@@ -38,6 +38,12 @@ public class ParameterDeclarationNode extends SyntaxTreeNode {
         this.identifier = identifier;
         this.isArray = isArray;
     }
+
+    public void visit(SyntaxTreeVisitor visitor) throws CompileErrorException {
+        visitor.accept(this, () -> {
+            SyntaxTreeNode.visit(typeSpecifier, visitor);
+        });
+    }
     
     public String toString() {
         StringBuilder builder = new StringBuilder();

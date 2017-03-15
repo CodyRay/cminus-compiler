@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.function.Function;
 
+import io.github.haroldhues.CompileErrorException;
+import io.github.haroldhues.SymbolTable;
+
 
 
 
@@ -11,6 +14,15 @@ import java.util.function.Function;
 public abstract class SyntaxTreeNode 
 {
     public SyntaxTreeNode() { }
+
+    public abstract void visit(SyntaxTreeVisitor visitor) throws CompileErrorException;
+
+    public static void visit(SyntaxTreeNode node, SyntaxTreeVisitor visitor) throws CompileErrorException {
+        if (node != null) {
+            node.visit(visitor);
+        }
+    }
+
     public static <T extends Object> EqualsBuilder<T> equalsBuilder(T tis) {
         return new EqualsBuilder<T>();
     }

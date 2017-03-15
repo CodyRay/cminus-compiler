@@ -37,6 +37,10 @@ public class TypeSpecifierNode extends SyntaxTreeNode {
         this.type = type;
     }
 
+    public void visit(SyntaxTreeVisitor visitor) throws CompileErrorException {
+        visitor.accept(this, () -> {});
+    }
+
     public String toString() {
     	if(type == Type.Int) {
     		return new Token(TokenType.Int).toString();    		

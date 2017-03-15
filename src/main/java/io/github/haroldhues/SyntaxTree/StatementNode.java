@@ -22,6 +22,7 @@ public abstract class StatementNode extends SyntaxTreeNode {
     }
 
     public abstract Type statementType();
+    public abstract boolean allPathsReturn();
 
     public static StatementNode parse(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
         if(parser.currentIs(TokenType.Write)) {

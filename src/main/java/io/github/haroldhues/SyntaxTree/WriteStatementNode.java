@@ -28,6 +28,16 @@ public class WriteStatementNode extends StatementNode {
         return StatementNode.Type.Write;
     }
 
+	public boolean allPathsReturn() {
+		return false; // write != return
+	}
+
+    public void visit(SyntaxTreeVisitor visitor) throws CompileErrorException {
+        visitor.accept(this, () -> {
+            SyntaxTreeNode.visit(expression, visitor);
+        });
+    }
+
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(new Token(TokenType.Write));

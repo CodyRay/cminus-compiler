@@ -42,6 +42,14 @@ public class CallExpressionNode extends ExpressionNode {
         return args;
     }
 
+    public void visit(SyntaxTreeVisitor visitor) throws CompileErrorException {
+        visitor.accept(this, () -> {
+            for(ExpressionNode argument: arguments) {
+                SyntaxTreeNode.visit(argument, visitor);
+            }
+        });
+    }
+
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(identifier);

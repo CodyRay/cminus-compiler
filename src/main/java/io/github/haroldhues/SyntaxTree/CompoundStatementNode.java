@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 
 import io.github.haroldhues.CompileErrorException;
 import io.github.haroldhues.Parser;
+import io.github.haroldhues.SymbolTable;
 import io.github.haroldhues.Tokens.Token;
 import io.github.haroldhues.Tokens.TokenType;
 
@@ -15,7 +16,10 @@ import java.util.ArrayList;
 
 
 public class CompoundStatementNode extends StatementNode {
+    // Attributes
+    public SymbolTable symbolTable = null;
 
+    // Children
     public List<DeclarationNode> localDeclarations = new ArrayList<DeclarationNode>();
     public List<StatementNode> statements = new ArrayList<StatementNode>();
 
@@ -50,8 +54,28 @@ public class CompoundStatementNode extends StatementNode {
         this.statements = statements;
     }
 
+    public boolean allPathsReturn() {
+        for(StatementNode statement: statements) {
+            if(statement.allPathsReturn()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public StatementNode.Type statementType() {
         return StatementNode.Type.Compound;
+    }
+
+    public void visit(SyntaxTreeVisitor visitor) throws CompileErrorException {
+        visitor.accept(this, () -> {
+            for(DeclarationNode declaration: localDeclarations) {
+                SyntaxTreeNode.visit(declaration, visitor);
+            }
+            for(StatementNode statement: statements) {
+                SyntaxTreeNode.visit(statement, visitor);
+            }
+        });
     }
 
     public String toString() {

@@ -89,6 +89,16 @@ public class DeclarationNode extends SyntaxTreeNode {
 		this.arraySize = arraySize;
 	}
 
+    public void visit(SyntaxTreeVisitor visitor) throws CompileErrorException {
+        visitor.accept(this, () -> {
+            SyntaxTreeNode.visit(typeSpecifier, visitor);
+            for(ParameterDeclarationNode parameter: functionParameters) {
+                SyntaxTreeNode.visit(parameter, visitor);
+            }
+            SyntaxTreeNode.visit(functionBody, visitor);
+        });
+    }
+
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(typeSpecifier);

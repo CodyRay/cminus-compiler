@@ -12,11 +12,18 @@ import io.github.haroldhues.Tokens.TokenType;
 
 public abstract class ExpressionNode extends SyntaxTreeNode {
     public enum Type {
-        NestedExpression, 
+        Assignment,
+        Nested, 
         Variable, 
         Call, 
         Literal, 
-        BinaryOperator
+        Binary,
+    }
+
+    public enum ResultType {
+        Integer,
+        IntegerArray,
+        Void
     }
 
     public static ExpressionNode parse(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
@@ -24,14 +31,13 @@ public abstract class ExpressionNode extends SyntaxTreeNode {
         // which also can be just `var`. To resolve this we assume that it is a simple
         // expression until we see the assignment operator
         ExpressionNode expression = parseComparableExpressionNode(parser, visitor);
-        if(parser.currentIs(TokenType.Assign)) {
+        if(parser.parseTokenIf(TokenType.Assign)) {
             if(expression.expressionType() != Type.Variable) {
                 throw new CompileErrorException("The left hand of an assignment must be a variable reference", parser.currentToken().getLine(), parser.currentToken().getColumn());
             }
-            ExpressionNode variable = expression;
-            Token assignment = parser.parseToken(TokenType.Assign);
+            VariableExpressionNode variable = (VariableExpressionNode)expression;
             expression = ExpressionNode.parse(parser, visitor);
-            expression = new BinaryExpressionNode(variable, assignment, expression);
+            expression = new AssignmentExpressionNode(variable, expression);
             visitor.accept(expression); // Since it was manually created
         }
         return expression;
@@ -106,4 +112,6 @@ public abstract class ExpressionNode extends SyntaxTreeNode {
     }
 
     public abstract ExpressionNode.Type expressionType();
+    
+    public ExpressionNode.ResultType resultType = null;
 }

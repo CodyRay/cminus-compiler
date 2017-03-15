@@ -32,6 +32,17 @@ public class IterationStatementNode extends StatementNode {
     public StatementNode.Type statementType() {
         return StatementNode.Type.Iteration;
     }
+
+	public boolean allPathsReturn() {
+		return false; // if the condition is never true it cannot return
+	}
+
+    public void visit(SyntaxTreeVisitor visitor) throws CompileErrorException {
+        visitor.accept(this, () -> {
+            SyntaxTreeNode.visit(condition, visitor);
+            SyntaxTreeNode.visit(block, visitor);
+        });
+    }
     
     public String toString() {
         StringBuilder builder = new StringBuilder();

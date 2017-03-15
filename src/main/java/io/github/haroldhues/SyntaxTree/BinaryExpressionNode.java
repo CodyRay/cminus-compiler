@@ -1,5 +1,6 @@
 package io.github.haroldhues.SyntaxTree;
 
+import io.github.haroldhues.CompileErrorException;
 import io.github.haroldhues.Tokens.*;
 
 public class BinaryExpressionNode extends ExpressionNode {
@@ -14,7 +15,14 @@ public class BinaryExpressionNode extends ExpressionNode {
     }
 
     public ExpressionNode.Type expressionType() {
-        return ExpressionNode.Type.BinaryOperator;
+        return ExpressionNode.Type.Binary;
+    }
+
+    public void visit(SyntaxTreeVisitor visitor) throws CompileErrorException {
+        visitor.accept(this, () -> {
+            SyntaxTreeNode.visit(left, visitor);
+            SyntaxTreeNode.visit(right, visitor);
+        });
     }
 
     public String toString() {

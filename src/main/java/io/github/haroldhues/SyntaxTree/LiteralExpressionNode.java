@@ -24,6 +24,10 @@ public class LiteralExpressionNode extends ExpressionNode {
         return ExpressionNode.Type.Literal;
     }
 
+    public void visit(SyntaxTreeVisitor visitor) throws CompileErrorException {
+        visitor.accept(this, () -> {});
+    }
+
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(new IntegerLiteralToken(value));

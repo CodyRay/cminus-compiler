@@ -8,6 +8,10 @@ import io.github.haroldhues.*;
 import io.github.haroldhues.Tokens.*;
 
 public class RootNode extends SyntaxTreeNode {
+    // Attributes
+    public SymbolTable symbolTable = null;
+
+    // Children
     public List<DeclarationNode> declarationList = new ArrayList<DeclarationNode>();
     
     public static RootNode parse(Parser parser, Consumer<SyntaxTreeNode> visitor) throws CompileErrorException {
@@ -23,6 +27,14 @@ public class RootNode extends SyntaxTreeNode {
 
     public RootNode(List<DeclarationNode> declarationList) {
         this.declarationList = declarationList;
+    }
+
+    public void visit(SyntaxTreeVisitor visitor) throws CompileErrorException {
+        visitor.accept(this, () -> {
+            for(DeclarationNode declaration: declarationList) {
+                SyntaxTreeNode.visit(declaration, visitor);
+            }
+        });
     }
 
     public String toString() {
