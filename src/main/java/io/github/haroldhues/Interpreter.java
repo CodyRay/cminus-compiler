@@ -174,7 +174,7 @@ public class Interpreter {
         return value(symbolTable, io, node);
     }
 
-    public static void assign(SymbolTable symbolTable, InputOutput io, VariableExpressionNode variable, int value) throws CompileErrorException {
+    private static void assign(SymbolTable symbolTable, InputOutput io, VariableExpressionNode variable, int value) throws CompileErrorException {
         if(variable.arrayExpression != null) {
             ArrayVariableEntry entry = (ArrayVariableEntry)symbolTable.get(variable.identifier);
             entry.setValue(run(symbolTable, variable.arrayExpression, io), value);
@@ -184,7 +184,7 @@ public class Interpreter {
         }
     }
 
-    public static int value(SymbolTable symbolTable, InputOutput io, VariableExpressionNode variable) throws CompileErrorException {
+    private static int value(SymbolTable symbolTable, InputOutput io, VariableExpressionNode variable) throws CompileErrorException {
         if(variable.arrayExpression != null) {
             ArrayVariableEntry entry = (ArrayVariableEntry)symbolTable.get(variable.identifier);
             return entry.getValue(run(symbolTable, variable.arrayExpression, io));

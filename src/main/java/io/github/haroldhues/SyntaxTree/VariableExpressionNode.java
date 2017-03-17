@@ -41,12 +41,6 @@ public class VariableExpressionNode extends ExpressionNode {
         return ExpressionNode.Type.Variable;
     }
 
-    public void visit(SyntaxTreeVisitor visitor) throws CompileErrorException {
-        visitor.accept(this, () -> {
-            SyntaxTreeNode.visit(arrayExpression, visitor);
-        });
-    }
-
     public String toString() {
         StringBuilder builder = new StringBuilder();
         if(arrayExpression != null) {

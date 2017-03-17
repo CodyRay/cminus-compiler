@@ -33,12 +33,6 @@ public class ReadStatementNode extends StatementNode {
         return StatementNode.Type.Read;
     }
 
-    public void visit(SyntaxTreeVisitor visitor) throws CompileErrorException {
-        visitor.accept(this, () -> {
-            SyntaxTreeNode.visit(reference, visitor);
-        });
-    }
-
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(new Token(TokenType.Read));

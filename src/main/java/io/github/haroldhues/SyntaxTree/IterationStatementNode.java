@@ -31,13 +31,6 @@ public class IterationStatementNode extends StatementNode {
     public StatementNode.Type statementType() {
         return StatementNode.Type.Iteration;
     }
-
-    public void visit(SyntaxTreeVisitor visitor) throws CompileErrorException {
-        visitor.accept(this, () -> {
-            SyntaxTreeNode.visit(condition, visitor);
-            SyntaxTreeNode.visit(block, visitor);
-        });
-    }
     
     public String toString() {
         StringBuilder builder = new StringBuilder();

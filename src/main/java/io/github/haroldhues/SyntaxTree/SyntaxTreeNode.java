@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.function.Function;
 
-import io.github.haroldhues.CompileErrorException;
 import io.github.haroldhues.Location;
 
 
@@ -21,14 +20,6 @@ public abstract class SyntaxTreeNode
 
     public Location getLocation() {
         return location;
-    }
-
-    public abstract void visit(SyntaxTreeVisitor visitor) throws CompileErrorException;
-
-    public static void visit(SyntaxTreeNode node, SyntaxTreeVisitor visitor) throws CompileErrorException {
-        if (node != null) {
-            node.visit(visitor);
-        }
     }
 
     public static <T extends Object> EqualsBuilder<T> equalsBuilder(T tis) {

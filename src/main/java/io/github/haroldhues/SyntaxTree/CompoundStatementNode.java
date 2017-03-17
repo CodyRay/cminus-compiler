@@ -2,7 +2,6 @@ package io.github.haroldhues.SyntaxTree;
 
 import java.util.List;
 import io.github.haroldhues.CompileErrorException;
-import io.github.haroldhues.InputOutput;
 import io.github.haroldhues.Location;
 import io.github.haroldhues.Parser;
 import io.github.haroldhues.SymbolTable;
@@ -56,17 +55,6 @@ public class CompoundStatementNode extends StatementNode {
 
     public StatementNode.Type statementType() {
         return StatementNode.Type.Compound;
-    }
-
-    public void visit(SyntaxTreeVisitor visitor) throws CompileErrorException {
-        visitor.accept(this, () -> {
-            for(DeclarationNode declaration: localDeclarations) {
-                SyntaxTreeNode.visit(declaration, visitor);
-            }
-            for(StatementNode statement: statements) {
-                SyntaxTreeNode.visit(statement, visitor);
-            }
-        });
     }
 
     public String toString() {

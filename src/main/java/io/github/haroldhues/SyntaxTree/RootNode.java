@@ -27,14 +27,6 @@ public class RootNode extends SyntaxTreeNode {
         this.declarationList = declarationList;
     }
 
-    public void visit(SyntaxTreeVisitor visitor) throws CompileErrorException {
-        visitor.accept(this, () -> {
-            for(DeclarationNode declaration: declarationList) {
-                SyntaxTreeNode.visit(declaration, visitor);
-            }
-        });
-    }
-
     public String toString() {
         StringBuilder builder = new StringBuilder();
         for(DeclarationNode syntax : declarationList) {

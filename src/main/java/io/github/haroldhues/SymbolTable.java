@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import io.github.haroldhues.SyntaxTree.CompoundStatementNode;
-import io.github.haroldhues.SyntaxTree.ExpressionNode;
-import io.github.haroldhues.SyntaxTree.StatementNode;
-import io.github.haroldhues.SyntaxTree.VariableExpressionNode;
 
 public class SymbolTable {
     private SymbolTable outerScope;

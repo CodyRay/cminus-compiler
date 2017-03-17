@@ -3,7 +3,6 @@ package io.github.haroldhues.SyntaxTree;
 import io.github.haroldhues.CompileErrorException;
 import io.github.haroldhues.Location;
 import io.github.haroldhues.Parser;
-import io.github.haroldhues.SymbolTable;
 import io.github.haroldhues.Tokens.IdentifierToken;
 import io.github.haroldhues.Tokens.Token;
 import io.github.haroldhues.Tokens.TokenType;

@@ -42,14 +42,6 @@ public class SelectionStatementNode extends StatementNode {
         return StatementNode.Type.Selection;
     }
 
-    public void visit(SyntaxTreeVisitor visitor) throws CompileErrorException {
-        visitor.accept(this, () -> {
-            SyntaxTreeNode.visit(condition, visitor);
-            SyntaxTreeNode.visit(ifBlock, visitor);
-            SyntaxTreeNode.visit(elseBlock, visitor);
-        });
-    }
-
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(new Token(TokenType.If));

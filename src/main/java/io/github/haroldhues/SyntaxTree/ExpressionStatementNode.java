@@ -29,12 +29,6 @@ public class ExpressionStatementNode extends StatementNode {
         return StatementNode.Type.Expression;
     }
 
-    public void visit(SyntaxTreeVisitor visitor) throws CompileErrorException {
-        visitor.accept(this, () -> {
-            SyntaxTreeNode.visit(expression, visitor);
-        });
-    }
-
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		if (expression != null) {
