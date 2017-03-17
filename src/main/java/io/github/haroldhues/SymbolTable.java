@@ -50,8 +50,8 @@ public class SymbolTable {
         recordSymbol(entry);
     }
 
-    public Entry get(String identifier) throws CompileErrorException {
-        return get(identifier, Location.None);
+    public Entry get(String identifier) {
+        return lookup.containsKey(identifier) ? lookup.get(identifier) : outerScope.get(identifier);
     }
 
     public Entry get(String identifier, Location location) throws CompileErrorException {
@@ -240,27 +240,31 @@ public class SymbolTable {
         }
 
         public void setValue(ArrayVariableEntry reference) {
-            this.reference = reference;
+        	if(reference.size != null) {
+        		this.reference = reference;
+        	} else {
+        		this.reference = reference.reference;
+        	}
         }
 
-        public void setValue(int index, int value) throws CompileErrorException {
+        public void setValue(int index, int value) {
             if(size != null) {
                 if(index < 0 || index >= size) {
-                    values[index] = value;
+                	throw new UnsupportedOperationException("Index of " + index + " out of bounds [" + size + "]");
                 } else {
-                    throw new CompileErrorException("Index of " + index + " out of bounds");
+                	values[index] = value;
                 }
             } else {
                 reference.setValue(index, value);
             }
         }
 
-        public int getValue(int index) throws CompileErrorException {
+        public int getValue(int index) {
             if(size != null) {
                 if(index < 0 || index >= size) {
-                    return values[index];
+                	throw new UnsupportedOperationException("Index of " + index + " out of bounds [" + size + "]");
                 } else {
-                    throw new CompileErrorException("Index of " + index + " out of bounds");
+                	return values[index];
                 }
             } else {
                 return reference.getValue(index);
@@ -317,6 +321,10 @@ public class SymbolTable {
 
         public void insert(String identifier, Entry entry) throws CompileErrorException {
             throw new UnsupportedOperationException("Cannot insert into global symbol table");
+        }
+
+        public Entry get(String identifier) {
+            throw new UnsupportedOperationException("'" + identifier + "' has not been defined");
         }
 
         public Entry get(String identifier, Location location) throws CompileErrorException {

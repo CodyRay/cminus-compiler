@@ -5,7 +5,7 @@ import io.github.haroldhues.SymbolTable.*;
 import io.github.haroldhues.SyntaxTree.*;
 
 public class Interpreter {
-    public static void run(RootNode rootNode, InputOutput io) throws CompileErrorException {
+    public static void run(RootNode rootNode, InputOutput io) {
         SymbolTable symbolTable = rootNode.symbolTable;
         FunctionEntry main = (FunctionEntry)symbolTable.get("main");
 
@@ -17,7 +17,7 @@ public class Interpreter {
         run(symbolTable, main.body, io);
     }
 
-    private static Integer run(SymbolTable symbolTable, StatementNode node, InputOutput io) throws CompileErrorException {
+    private static Integer run(SymbolTable symbolTable, StatementNode node, InputOutput io) {
         if(node.statementType() == StatementNode.Type.Compound) {
             return run(symbolTable, (CompoundStatementNode)node, io);
         } else if(node.statementType() == StatementNode.Type.Expression) {
@@ -33,11 +33,11 @@ public class Interpreter {
         } else if(node.statementType() == StatementNode.Type.Write) {
             return run(symbolTable, (WriteStatementNode)node, io);
         } else {
-            throw new CompileErrorException("Unrecognized statement type");
+            throw new UnsupportedOperationException("Unrecognized statement type");
         }
     }
 
-    private static Integer run(SymbolTable symbolTable, CompoundStatementNode node, InputOutput io) throws CompileErrorException {
+    private static Integer run(SymbolTable symbolTable, CompoundStatementNode node, InputOutput io) {
         // Create a new scope for this block
         symbolTable = node.symbolTable;
 
@@ -55,12 +55,12 @@ public class Interpreter {
         return null;
     }
     
-    private static Integer run(SymbolTable symbolTable, ExpressionStatementNode node, InputOutput io) throws CompileErrorException {
+    private static Integer run(SymbolTable symbolTable, ExpressionStatementNode node, InputOutput io) {
         run(symbolTable, node.expression, io);
         return null; // No Return
     }
     
-    private static Integer run(SymbolTable symbolTable, IterationStatementNode node, InputOutput io) throws CompileErrorException {
+    private static Integer run(SymbolTable symbolTable, IterationStatementNode node, InputOutput io) {
         while(run(symbolTable, node.condition, io) > 0) {
             Integer result = run(symbolTable, node.block, io);
             if(result != null) {
@@ -70,17 +70,17 @@ public class Interpreter {
         return null; // No Return
     }
     
-    private static Integer run(SymbolTable symbolTable, ReadStatementNode node, InputOutput io) throws CompileErrorException {
+    private static Integer run(SymbolTable symbolTable, ReadStatementNode node, InputOutput io) {
         int in = io.read();
         assign(symbolTable, io, node.reference, in);
         return null; // No Return
     }
     
-    private static Integer run(SymbolTable symbolTable, ReturnStatementNode node, InputOutput io) throws CompileErrorException {
+    private static Integer run(SymbolTable symbolTable, ReturnStatementNode node, InputOutput io) {
         return run(symbolTable, node.expression, io); // Returns
     }
     
-    private static Integer run(SymbolTable symbolTable, SelectionStatementNode node, InputOutput io) throws CompileErrorException {
+    private static Integer run(SymbolTable symbolTable, SelectionStatementNode node, InputOutput io) {
         if(run(symbolTable, node.condition, io) > 0) {
             return run(symbolTable, node.ifBlock, io);
         } else {
@@ -88,12 +88,12 @@ public class Interpreter {
         }
     }
     
-    private static Integer run(SymbolTable symbolTable, WriteStatementNode node, InputOutput io) throws CompileErrorException {
+    private static Integer run(SymbolTable symbolTable, WriteStatementNode node, InputOutput io) {
         io.write(run(symbolTable, node.expression, io));
         return null; // No Return
     }
 
-    private static Integer run(SymbolTable symbolTable, ExpressionNode node, InputOutput io) throws CompileErrorException {
+    private static Integer run(SymbolTable symbolTable, ExpressionNode node, InputOutput io) {
         if(node.expressionType() == ExpressionNode.Type.Assignment) {
             return run(symbolTable, (AssignmentExpressionNode)node, io);
         } else if(node.expressionType() == ExpressionNode.Type.Binary) {
@@ -107,17 +107,17 @@ public class Interpreter {
         } else if(node.expressionType() == ExpressionNode.Type.Variable) {
             return run(symbolTable, (VariableExpressionNode)node, io);
         } else {
-            throw new CompileErrorException("Unrecognized statement type");
+            throw new UnsupportedOperationException("Unrecognized statement type");
         }
     }
 
-    private static Integer run(SymbolTable symbolTable, AssignmentExpressionNode node, InputOutput io) throws CompileErrorException {
+    private static Integer run(SymbolTable symbolTable, AssignmentExpressionNode node, InputOutput io) {
         Integer value = run(symbolTable, node.expression, io);
         assign(symbolTable, io, node.variable, value);
         return value;
     }
 
-    private static Integer run(SymbolTable symbolTable, BinaryExpressionNode node, InputOutput io) throws CompileErrorException {
+    private static Integer run(SymbolTable symbolTable, BinaryExpressionNode node, InputOutput io) {
         switch(node.operation.type) {
             case Add:
                 return run(symbolTable, node.left, io) + run(symbolTable, node.right, io);
@@ -144,14 +144,14 @@ public class Interpreter {
         }
     }
 
-    private static Integer run(SymbolTable symbolTable, CallExpressionNode node, InputOutput io) throws CompileErrorException {
+    private static Integer run(SymbolTable symbolTable, CallExpressionNode node, InputOutput io) {
         FunctionEntry entry = (FunctionEntry) symbolTable.get(node.identifier);
         for(int x = 0; x < node.arguments.size(); x++) {
             FunctionEntry.Parameter param = entry.parameters.get(x);
             ExpressionNode arg = node.arguments.get(x);
             if(param.isArray) {
+            	VariableExpressionNode reference = (VariableExpressionNode)arg;
                 ArrayVariableEntry variable = (ArrayVariableEntry)entry.body.symbolTable.get(param.identifier);
-                VariableExpressionNode reference = (VariableExpressionNode)arg;
                 variable.setValue((ArrayVariableEntry)symbolTable.get(reference.identifier));
             } else {
                 VariableEntry variable = (VariableEntry)entry.body.symbolTable.get(param.identifier);
@@ -162,19 +162,19 @@ public class Interpreter {
         return run(symbolTable, entry.body, io);
     }
 
-    private static Integer run(SymbolTable symbolTable, LiteralExpressionNode node, InputOutput io) throws CompileErrorException {
+    private static Integer run(SymbolTable symbolTable, LiteralExpressionNode node, InputOutput io) {
         return node.value;
     }
 
-    private static Integer run(SymbolTable symbolTable, NestedExpressionNode node, InputOutput io) throws CompileErrorException {
+    private static Integer run(SymbolTable symbolTable, NestedExpressionNode node, InputOutput io) {
         return run(symbolTable, node.expression, io);
     }
 
-    private static Integer run(SymbolTable symbolTable, VariableExpressionNode node, InputOutput io) throws CompileErrorException {
+    private static Integer run(SymbolTable symbolTable, VariableExpressionNode node, InputOutput io) {
         return value(symbolTable, io, node);
     }
 
-    private static void assign(SymbolTable symbolTable, InputOutput io, VariableExpressionNode variable, int value) throws CompileErrorException {
+    private static void assign(SymbolTable symbolTable, InputOutput io, VariableExpressionNode variable, int value) {
         if(variable.arrayExpression != null) {
             ArrayVariableEntry entry = (ArrayVariableEntry)symbolTable.get(variable.identifier);
             entry.setValue(run(symbolTable, variable.arrayExpression, io), value);
@@ -184,13 +184,13 @@ public class Interpreter {
         }
     }
 
-    private static int value(SymbolTable symbolTable, InputOutput io, VariableExpressionNode variable) throws CompileErrorException {
+    private static int value(SymbolTable symbolTable, InputOutput io, VariableExpressionNode variable) {
         if(variable.arrayExpression != null) {
             ArrayVariableEntry entry = (ArrayVariableEntry)symbolTable.get(variable.identifier);
             return entry.getValue(run(symbolTable, variable.arrayExpression, io));
         } else {
-            VariableEntry entry = (VariableEntry)symbolTable.get(variable.identifier);
-            return entry.getValue();
+    		VariableEntry entry = (VariableEntry)symbolTable.get(variable.identifier);        		
+    		return entry.getValue();
         }
     }
 }

@@ -155,9 +155,11 @@ public class Checker {
         if(check(symbolTable, node.condition, function) != ResultType.Integer) {
             throw new CompileErrorException("The condition for a if statement must be an integer", node.condition.getLocation());
         }
-
+        boolean ifReturns = check(symbolTable, node.ifBlock, function);
+        boolean elseReturns = node.elseBlock != null && check(symbolTable, node.elseBlock, function);
+        
         // Only true if both the if and the else are present
-		return check(symbolTable, node.ifBlock, function) && node.elseBlock != null && check(symbolTable, node.elseBlock, function);
+		return ifReturns && elseReturns;
     }
     
     private static boolean check(SymbolTable symbolTable, WriteStatementNode node, DeclarationNode function) throws CompileErrorException {

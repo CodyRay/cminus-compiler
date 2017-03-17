@@ -451,6 +451,17 @@ public class CheckerTest {
 	}
 	
 	@Test
+	public void testArgumentNotVariableExpressionError() {
+		// Function, 'My Function' received 2 arguments, but 0 were expected
+		testError("Argument", "requires a variable reference, not an expression",
+				"void myFunction( int x[], int y ) { }\r\n" + 
+				"void main( void ) {\r\n" + 
+				"    int z[1];\r\n" + 
+				"    myFunction((z), 1);\r\n" + 
+				"}");
+	}
+	
+	@Test
 	public void testIntegerOnBothSidesOfExpressionError() {
 		String errorMessage = "Both sides of an add expression must result in integers";
 		testError(errorMessage,
