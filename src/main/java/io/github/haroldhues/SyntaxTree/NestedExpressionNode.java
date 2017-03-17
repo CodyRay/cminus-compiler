@@ -15,6 +15,10 @@ public class NestedExpressionNode extends ExpressionNode {
         return ExpressionNode.Type.Nested;
     }
 
+    public String toAstString() {
+        return buildAstString("NestedExpressionNode", location.toAstString(), expression.toAstString());
+    }
+
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(new Token(TokenType.LeftParenthesis));

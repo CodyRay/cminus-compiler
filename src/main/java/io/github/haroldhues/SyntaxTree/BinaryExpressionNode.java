@@ -19,6 +19,13 @@ public class BinaryExpressionNode extends ExpressionNode {
         return ExpressionNode.Type.Binary;
     }
 
+    public String toAstString() {
+        return buildAstString("BinaryExpressionNode", location.toAstString(), 
+            left.toAstString(),
+            "new Token(\"" + operation.toString().trim() + "\")", 
+            right.toAstString());
+    }
+
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(left.toString());

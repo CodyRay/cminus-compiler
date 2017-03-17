@@ -37,6 +37,10 @@ public class ParameterDeclarationNode extends SyntaxTreeNode {
         this.identifier = identifier;
         this.isArray = isArray;
     }
+
+    public String toAstString() {
+        return buildAstString("ParameterDeclarationNode", location.toAstString(), typeSpecifier.toAstString(), "\"" + identifier + "\"", isArray ? "true" : "false");
+    }
     
     public String toString() {
         StringBuilder builder = new StringBuilder();

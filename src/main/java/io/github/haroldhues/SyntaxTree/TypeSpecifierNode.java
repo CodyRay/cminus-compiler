@@ -35,6 +35,10 @@ public class TypeSpecifierNode extends SyntaxTreeNode {
         this.type = type;
     }
 
+    public String toAstString() {
+        return buildAstString("TypeSpecifierNode", location.toAstString(), "TypeSpecifierNode.Type." + type.toString());
+    }
+
     public String toString() {
     	if(type == Type.Int) {
     		return new Token(TokenType.Int).toString();    		

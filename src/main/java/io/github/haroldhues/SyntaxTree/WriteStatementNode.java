@@ -27,6 +27,10 @@ public class WriteStatementNode extends StatementNode {
         return StatementNode.Type.Write;
     }
 
+    public String toAstString() {
+        return buildAstString("WriteStatementNode", location.toAstString(), expression.toAstString());
+    }
+
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(new Token(TokenType.Write));

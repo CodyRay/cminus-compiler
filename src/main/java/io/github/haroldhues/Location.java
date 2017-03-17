@@ -26,6 +26,10 @@ public class Location
         return Integer.toString(line) + ":" + Integer.toString(column);
     }
 
+    public String toAstString() {
+        return "new Location(" + line + ", " + column + ")";
+    }
+
     private static class NoLocation extends Location {
         public Integer getLine() {
             return null;

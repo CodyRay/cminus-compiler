@@ -41,6 +41,14 @@ public class VariableExpressionNode extends ExpressionNode {
         return ExpressionNode.Type.Variable;
     }
 
+    public String toAstString() {
+        if(arrayExpression != null) {
+            return buildAstString("VariableExpressionNode", location.toAstString(), "\"" + identifier + "\"", arrayExpression.toAstString());
+        } else {
+            return buildAstString("VariableExpressionNode", location.toAstString(), "\"" + identifier + "\"");
+        }
+    }
+
     public String toString() {
         StringBuilder builder = new StringBuilder();
         if(arrayExpression != null) {

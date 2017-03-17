@@ -26,6 +26,10 @@ public class ReturnStatementNode extends StatementNode {
     public StatementNode.Type statementType() {
         return StatementNode.Type.Return;
     }
+
+    public String toAstString() {
+        return buildAstString("ReturnStatementNode", location.toAstString(), expression.toAstString());
+    }
     
     public String toString() {
         StringBuilder builder = new StringBuilder();

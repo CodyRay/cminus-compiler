@@ -2,6 +2,8 @@ package io.github.haroldhues.SyntaxTree;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import io.github.haroldhues.CompileErrorException;
 import io.github.haroldhues.Location;
 import io.github.haroldhues.Parser;
@@ -89,6 +91,18 @@ public class DeclarationNode extends SyntaxTreeNode {
 		this.typeSpecifier = typeSpecifier;
 		this.identifier = identifier;
 		this.arraySize = arraySize;
+	}
+
+	public String toAstString() {
+		if (type == Type.ArrayVariable) {
+			return buildAstString("DeclarationNode", location.toAstString(), typeSpecifier.toAstString(), "\"" + identifier + "\"", Integer.toString(arraySize));
+		} else if (type == Type.Variable) {
+			return buildAstString("DeclarationNode", location.toAstString(), typeSpecifier.toAstString(), "\"" + identifier + "\"");
+		} else {
+			return buildAstString("DeclarationNode", location.toAstString(), typeSpecifier.toAstString(), "\"" + identifier + "\"",
+				buildAstList("ParameterDeclarationNode", functionParameters.stream().map(a -> a.toAstString()).collect(Collectors.toList())), 
+				functionBody.toAstString());
+		}
 	}
 
 	public String toString() {

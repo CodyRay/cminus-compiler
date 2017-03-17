@@ -42,6 +42,13 @@ public class SelectionStatementNode extends StatementNode {
         return StatementNode.Type.Selection;
     }
 
+    public String toAstString() {
+        return buildAstString("SelectionStatementNode", location.toAstString(), 
+            condition.toAstString(), 
+            ifBlock.toAstString(), 
+            elseBlock == null ? "null" : elseBlock.toAstString());
+    }
+
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(new Token(TokenType.If));

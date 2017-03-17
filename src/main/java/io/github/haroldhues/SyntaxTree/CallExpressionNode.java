@@ -1,6 +1,8 @@
 package io.github.haroldhues.SyntaxTree;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
 import io.github.haroldhues.*;
 import io.github.haroldhues.Tokens.*;
 
@@ -30,6 +32,10 @@ public class CallExpressionNode extends ExpressionNode {
             parser.parseToken(TokenType.RightParenthesis);
         }
         return args;
+    }
+
+    public String toAstString() {
+        return buildAstString("CallExpressionNode", location.toAstString(), "\"" + identifier + "\"", buildAstList("ExpressionNode", arguments.stream().map(a -> a.toAstString()).collect(Collectors.toList())));
     }
 
     public String toString() {

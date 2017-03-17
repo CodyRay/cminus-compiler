@@ -17,6 +17,10 @@ public class AssignmentExpressionNode extends ExpressionNode {
 		return ExpressionNode.Type.Assignment;
 	}
 
+	public String toAstString() {
+		return buildAstString("AssignmentExpressionNode", location.toAstString(), variable.toAstString(), expression.toAstString());
+	}
+
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(variable);

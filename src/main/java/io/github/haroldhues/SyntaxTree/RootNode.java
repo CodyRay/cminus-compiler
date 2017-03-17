@@ -2,6 +2,8 @@ package io.github.haroldhues.SyntaxTree;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import io.github.haroldhues.*;
 import io.github.haroldhues.Tokens.*;
 
@@ -25,6 +27,10 @@ public class RootNode extends SyntaxTreeNode {
     public RootNode(Location location, List<DeclarationNode> declarationList) {
     	super(location);
         this.declarationList = declarationList;
+    }
+
+    public String toAstString() {
+        return buildAstString("RootNode", location.toAstString(), buildAstList("DeclarationNode", declarationList.stream().map(a -> a.toAstString()).collect(Collectors.toList())));
     }
 
     public String toString() {

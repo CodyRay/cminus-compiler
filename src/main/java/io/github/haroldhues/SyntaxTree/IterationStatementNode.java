@@ -31,6 +31,10 @@ public class IterationStatementNode extends StatementNode {
     public StatementNode.Type statementType() {
         return StatementNode.Type.Iteration;
     }
+
+    public String toAstString() {
+        return buildAstString("IterationStatementNode", location.toAstString(), condition.toAstString(), block.toAstString());
+    }
     
     public String toString() {
         StringBuilder builder = new StringBuilder();

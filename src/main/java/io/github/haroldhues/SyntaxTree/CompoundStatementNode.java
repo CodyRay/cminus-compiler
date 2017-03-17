@@ -1,6 +1,8 @@
 package io.github.haroldhues.SyntaxTree;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
 import io.github.haroldhues.CompileErrorException;
 import io.github.haroldhues.Location;
 import io.github.haroldhues.Parser;
@@ -55,6 +57,11 @@ public class CompoundStatementNode extends StatementNode {
 
     public StatementNode.Type statementType() {
         return StatementNode.Type.Compound;
+    }
+
+    public String toAstString() {
+        return buildAstString("CompoundStatementNode", location.toAstString(), buildAstList("DeclarationNode", localDeclarations.stream().map(a -> a.toAstString()).collect(Collectors.toList())),
+            buildAstList("StatementNode", statements.stream().map(a -> a.toAstString()).collect(Collectors.toList())));
     }
 
     public String toString() {

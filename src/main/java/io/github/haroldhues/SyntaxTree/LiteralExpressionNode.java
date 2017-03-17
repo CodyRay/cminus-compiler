@@ -22,6 +22,10 @@ public class LiteralExpressionNode extends ExpressionNode {
         return ExpressionNode.Type.Literal;
     }
 
+    public String toAstString() {
+        return buildAstString("LiteralExpressionNode", location.toAstString(), value.toString());
+    }
+
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(new IntegerLiteralToken(value));

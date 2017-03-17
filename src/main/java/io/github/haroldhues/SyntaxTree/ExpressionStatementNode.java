@@ -29,6 +29,10 @@ public class ExpressionStatementNode extends StatementNode {
         return StatementNode.Type.Expression;
     }
 
+	public String toAstString() {
+		return buildAstString("ExpressionStatementNode", location.toAstString(), expression.toAstString());
+	}
+
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		if (expression != null) {

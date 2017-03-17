@@ -40,6 +40,10 @@ public class ReadStatementNode extends StatementNode {
         builder.append(new Token(TokenType.Semicolon));
         return builder.toString();
     }
+
+    public String toAstString() {
+        return buildAstString("ReadStatementNode", location.toAstString(), reference.toAstString());
+    }
     
     public boolean equals(Object other) {
 		return equalsBuilder(this)
