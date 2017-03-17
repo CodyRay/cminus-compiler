@@ -29,10 +29,6 @@ public class ExpressionStatementNode extends StatementNode {
         return StatementNode.Type.Expression;
     }
 
-	public boolean allPathsReturn() {
-		return false; // There can be no returns from an expression
-	}
-
     public void visit(SyntaxTreeVisitor visitor) throws CompileErrorException {
         visitor.accept(this, () -> {
             SyntaxTreeNode.visit(expression, visitor);

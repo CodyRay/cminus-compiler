@@ -5,6 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.github.haroldhues.SyntaxTree.CompoundStatementNode;
+import io.github.haroldhues.SyntaxTree.ExpressionNode;
+import io.github.haroldhues.SyntaxTree.StatementNode;
+import io.github.haroldhues.SyntaxTree.VariableExpressionNode;
+
 public class SymbolTable {
     private SymbolTable outerScope;
     private Map<String, Entry> lookup = new HashMap<String, Entry>();
@@ -48,8 +53,11 @@ public class SymbolTable {
         recordSymbol(entry);
     }
 
+    public Entry get(String identifier) throws CompileErrorException {
+        return get(identifier, Location.None);
+    }
 
-        public Entry get(String identifier, Location location) throws CompileErrorException {
+    public Entry get(String identifier, Location location) throws CompileErrorException {
         return lookup.containsKey(identifier) ? lookup.get(identifier) : outerScope.get(identifier, location);
     }
 
@@ -85,6 +93,8 @@ public class SymbolTable {
             this.location = location;
         }
 
+        public abstract void initialize();
+
         public Location getLocation() {
             return location;
         }
@@ -108,12 +118,18 @@ public class SymbolTable {
     public static class FunctionEntry extends Entry {
         public ReturnType returnType;
         public List<Parameter> parameters;
+        public CompoundStatementNode body;
 
-        public FunctionEntry(Location location, String identifier, ReturnType returnType, List<Parameter> parameters) {
+        public FunctionEntry(Location location, String identifier, ReturnType returnType, List<Parameter> parameters, CompoundStatementNode body) {
             super(location);
             this.identifier = identifier;
             this.returnType = returnType;
             this.parameters = parameters;
+            this.body = body;
+        }
+
+        public void initialize() {
+            // Nothing to do because a function has no state
         }
 
         public Type getType() {
@@ -169,6 +185,7 @@ public class SymbolTable {
     }
 
     public static class VariableEntry extends Entry {
+        private int value;
         public Type getType() {
             return Type.Variable;
         }
@@ -176,6 +193,18 @@ public class SymbolTable {
         public VariableEntry(Location location, String identifier) {
             super(location);
             this.identifier = identifier;
+        }
+
+        public void initialize() {
+            value = 0;
+        }
+
+        public void setValue(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return this.value;
         }
 
         public String toString() {
@@ -198,11 +227,47 @@ public class SymbolTable {
 
     public static class ArrayVariableEntry extends Entry {
         public Integer size = null;
+        public ArrayVariableEntry reference = null;
+        public int[] values;
 
         public ArrayVariableEntry(Location location, String identifier, Integer size) {
             super(location);
             this.identifier = identifier;
             this.size = size;
+        }
+
+        public void initialize() {
+            if(size != null) {
+                values = new int[size]; // Ints will be initialized to 0;
+            }
+        }
+
+        public void setValue(ArrayVariableEntry reference) {
+            this.reference = reference;
+        }
+
+        public void setValue(int index, int value) throws CompileErrorException {
+            if(size != null) {
+                if(index < 0 || index >= size) {
+                    values[index] = value;
+                } else {
+                    throw new CompileErrorException("Index of " + index + " out of bounds");
+                }
+            } else {
+                reference.setValue(index, value);
+            }
+        }
+
+        public int getValue(int index) throws CompileErrorException {
+            if(size != null) {
+                if(index < 0 || index >= size) {
+                    return values[index];
+                } else {
+                    throw new CompileErrorException("Index of " + index + " out of bounds");
+                }
+            } else {
+                return reference.getValue(index);
+            }
         }
 
         public Type getType() {

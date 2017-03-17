@@ -3,6 +3,7 @@ package io.github.haroldhues.SyntaxTree;
 import io.github.haroldhues.CompileErrorException;
 import io.github.haroldhues.Location;
 import io.github.haroldhues.Parser;
+import io.github.haroldhues.SymbolTable;
 import io.github.haroldhues.Tokens.IdentifierToken;
 import io.github.haroldhues.Tokens.Token;
 import io.github.haroldhues.Tokens.TokenType;
@@ -15,12 +16,6 @@ public abstract class ExpressionNode extends SyntaxTreeNode {
         Call, 
         Literal, 
         Binary,
-    }
-
-    public enum ResultType {
-        Integer,
-        IntegerArray,
-        Void
     }
     
     protected ExpressionNode(Location location) {
@@ -108,6 +103,4 @@ public abstract class ExpressionNode extends SyntaxTreeNode {
     }
 
     public abstract ExpressionNode.Type expressionType();
-    
-    public ExpressionNode.ResultType resultType = null;
 }

@@ -13,8 +13,7 @@ public class CheckerTest {
 		Scanner testScanner = new Scanner(testSource);
 		Parser parser = new Parser(testScanner);
 		RootNode ast = parser.parse();
-        Checker checker = new Checker(ast);
-		checker.check();
+		Checker.check(ast);
         assertNotNull(ast.symbolTable);
 		return ast;
 	}

@@ -42,11 +42,6 @@ public class SelectionStatementNode extends StatementNode {
         return StatementNode.Type.Selection;
     }
 
-	public boolean allPathsReturn() {
-        // Only true if both the if and the else are present
-		return ifBlock.allPathsReturn() && elseBlock != null && elseBlock.allPathsReturn();
-	}
-
     public void visit(SyntaxTreeVisitor visitor) throws CompileErrorException {
         visitor.accept(this, () -> {
             SyntaxTreeNode.visit(condition, visitor);

@@ -33,10 +33,6 @@ public class ReturnStatementNode extends StatementNode {
         });
     }
 
-    public boolean allPathsReturn() {
-        return true;
-    }
-
     public String toString() {
         StringBuilder builder = new StringBuilder();
         if(expression != null) {

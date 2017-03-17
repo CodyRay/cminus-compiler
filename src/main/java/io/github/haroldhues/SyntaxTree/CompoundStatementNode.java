@@ -2,6 +2,7 @@ package io.github.haroldhues.SyntaxTree;
 
 import java.util.List;
 import io.github.haroldhues.CompileErrorException;
+import io.github.haroldhues.InputOutput;
 import io.github.haroldhues.Location;
 import io.github.haroldhues.Parser;
 import io.github.haroldhues.SymbolTable;
@@ -51,15 +52,6 @@ public class CompoundStatementNode extends StatementNode {
     	super(location);
         this.localDeclarations = localDeclarations;
         this.statements = statements;
-    }
-
-    public boolean allPathsReturn() {
-        for(StatementNode statement: statements) {
-            if(statement.allPathsReturn()) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public StatementNode.Type statementType() {
