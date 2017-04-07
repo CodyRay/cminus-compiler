@@ -4,26 +4,7 @@ Run the compiler using the `cminus.bat` file (or `cminus` for linux) in the
 `bin/` folder.
 
 ```
-Usage: cminus [options] input_file
- `cminus` compiles the C- source language in the `input_file` into an 
- executable in the `output_file`
-
- If the `-o` option is not used, then the output file will have the same name 
- as the input file but with an executable extension.
-
- options:
-  -o output_file        specifies the output executable
-  -f                    overwrites the output file if it already exists
-  -v                    explain what is being done verbosely
-  -h, --help            show this usage guide
-
-For example:
- # Compile prog1.cm to prog.exe (fails if prog1.exe exists)
- cminus.bat -o prog.exe prog1.cm
- # Compile prog.cm to prog.exe (fails if prog.exe exists)
- cminus.bat prog.cm
- # Compile prog1.cm to prog.exe verbosely (overwrites if prog.exe exists)
- cminus.bat -o prog.exe -v -f prog1.cm
+Usage: cminus input_file
 ```
 
 # C- Language
